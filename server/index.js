@@ -11,7 +11,10 @@ const PORT = config.PORT;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174']
+  origin: config.NODE_ENV === 'production'
+    ? [config.CLIENT_URL, /\.railway\.app$/]
+    : ['http://localhost:5173', 'http://localhost:5174'],
+  credentials: true
 }));
 app.use(express.json());
 
@@ -33,9 +36,10 @@ app.use((err, req, res, next) => {
 // Initialize database and start server
 initializeDatabase()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-      console.log(`API endpoints available at http://localhost:${PORT}/api`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server is running on port ${PORT}`);
+      console.log(`API endpoints available at /api`);
+      console.log(`Environment: ${config.NODE_ENV}`);
     });
   })
   .catch((error) => {
