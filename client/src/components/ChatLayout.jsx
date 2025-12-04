@@ -4,6 +4,7 @@ import ChatMessage from './ChatMessage';
 import QuickChips from './QuickChips';
 import TypingIndicator from './TypingIndicator';
 import Sidebar from './Sidebar';
+import IntakeFlow from './IntakeFlow';
 
 const EMPLOYEE_CHIPS = [
   "I want to report harassment",
@@ -20,8 +21,9 @@ const IC_CHIPS = [
 ];
 
 export default function ChatLayout() {
-  const { messages, currentMode, isTyping, sidebarOpen, setSidebarOpen, addMessage } = useChat();
+  const { messages, currentMode, isTyping, sidebarOpen, setSidebarOpen, addMessage, setIsTyping } = useChat();
   const [inputValue, setInputValue] = useState('');
+  const [showIntakeFlow, setShowIntakeFlow] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -29,31 +31,71 @@ export default function ChatLayout() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [messages, isTyping, showIntakeFlow]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const processMessage = async (message) => {
+    try {
+      setIsTyping(true);
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, mode: currentMode })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.response) {
+        const { type, content } = result.response;
+
+        // Handle different response types
+        if (type === 'intake_start') {
+          setShowIntakeFlow(true);
+          addMessage('system', content.message);
+        } else if (type === 'case_list') {
+          const summary = content.summary || `Found ${content.cases?.length || 0} cases`;
+          addMessage('system', summary);
+        } else if (type === 'case_detail') {
+          addMessage('system', content.message);
+        } else if (type === 'case_update_success') {
+          addMessage('system', content.message);
+        } else if (type === 'text') {
+          addMessage('system', content);
+        } else if (type === 'error') {
+          addMessage('system', `Error: ${content}`);
+        } else {
+          addMessage('system', content.toString());
+        }
+      } else {
+        addMessage('system', 'Sorry, I encountered an error processing your request.');
+      }
+    } catch (error) {
+      console.error('Failed to process message:', error);
+      addMessage('system', 'Sorry, I encountered an error. Please try again.');
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
   const handleSend = () => {
     if (inputValue.trim()) {
       addMessage('user', inputValue.trim());
+      processMessage(inputValue.trim());
       setInputValue('');
-
-      // Simulate system response (placeholder for now)
-      setTimeout(() => {
-        addMessage('system', `I received your message: "${inputValue.trim()}". This is a placeholder response.`);
-      }, 1000);
     }
   };
 
   const handleChipSelect = (chip) => {
     addMessage('user', chip);
+    processMessage(chip);
+  };
 
-    // Simulate system response
-    setTimeout(() => {
-      addMessage('system', `Processing your request: "${chip}". This is a placeholder response.`);
-    }, 1000);
+  const handleIntakeComplete = () => {
+    setShowIntakeFlow(false);
   };
 
   const handleKeyPress = (e) => {
@@ -105,7 +147,7 @@ export default function ChatLayout() {
 
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto">
-          {messages.length === 0 ? (
+          {messages.length === 0 && !showIntakeFlow ? (
             <div className="flex items-center justify-center h-full px-4">
               <div className="text-center max-w-md">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -131,42 +173,45 @@ export default function ChatLayout() {
                 />
               ))}
               {isTyping && <TypingIndicator />}
+              {showIntakeFlow && <IntakeFlow onComplete={handleIntakeComplete} />}
               <div ref={messagesEndRef} />
             </div>
           )}
         </div>
 
-        {/* Input Area */}
-        <div className="bg-white border-t border-gray-200 p-4">
-          {/* Quick Action Chips */}
-          <QuickChips chips={chips} onSelect={handleChipSelect} />
+        {/* Input Area - Hide when intake flow is active */}
+        {!showIntakeFlow && (
+          <div className="bg-white border-t border-gray-200 p-4">
+            {/* Quick Action Chips */}
+            <QuickChips chips={chips} onSelect={handleChipSelect} />
 
-          {/* Input Field */}
-          <div className="flex gap-2 mt-3">
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={
-                currentMode === 'employee'
-                  ? 'Type your message here...'
-                  : 'Search cases or ask a question...'
-              }
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[44px]"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!inputValue.trim()}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors min-h-[44px] flex items-center justify-center"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
+            {/* Input Field */}
+            <div className="flex gap-2 mt-3">
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={
+                  currentMode === 'employee'
+                    ? 'Type your message here...'
+                    : 'Search cases or ask a question...'
+                }
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[44px]"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!inputValue.trim()}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors min-h-[44px] flex items-center justify-center"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

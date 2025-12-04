@@ -3,7 +3,7 @@
  * Generates structured responses based on parsed intents
  */
 
-import { caseService } from './caseService.js';
+import { caseService } from './caseServicePg.js';
 import { getHelpText } from './chatParser.js';
 
 /**
@@ -62,7 +62,7 @@ export async function generateResponse(intent, params, mode) {
  */
 async function handleCaseList() {
   try {
-    const cases = caseService.getAllCases();
+    const cases = await caseService.getAllCases();
 
     if (cases.length === 0) {
       return {
@@ -94,7 +94,7 @@ async function handleCaseList() {
  */
 async function handleCasePending() {
   try {
-    const allCases = caseService.getAllCases();
+    const allCases = await caseService.getAllCases();
     const pendingCases = allCases.filter(c =>
       c.status === 'under_review' || c.status === 'new'
     );
@@ -126,7 +126,7 @@ async function handleCasePending() {
  */
 async function handleCaseOverdue() {
   try {
-    const allCases = caseService.getAllCases();
+    const allCases = await caseService.getAllCases();
     const overdueCases = allCases.filter(c => c.is_overdue);
 
     if (overdueCases.length === 0) {
@@ -156,7 +156,7 @@ async function handleCaseOverdue() {
  */
 async function handleCaseToday() {
   try {
-    const allCases = caseService.getAllCases();
+    const allCases = await caseService.getAllCases();
     const todayCases = allCases.filter(c => c.days_remaining === 0);
 
     if (todayCases.length === 0) {
@@ -195,7 +195,7 @@ async function handleCaseStatus(params) {
       };
     }
 
-    const caseData = caseService.getCaseByCode(case_code);
+    const caseData = await caseService.getCaseByCode(case_code);
 
     if (!caseData) {
       return {
@@ -204,7 +204,7 @@ async function handleCaseStatus(params) {
       };
     }
 
-    const history = caseService.getCaseHistoryByCode(case_code);
+    const history = await caseService.getCaseHistoryByCode(case_code);
 
     return {
       type: 'case_detail',
@@ -248,7 +248,7 @@ async function handleCaseUpdate(params) {
       };
     }
 
-    const updatedCase = caseService.updateCaseStatus(
+    const updatedCase = await caseService.updateCaseStatus(
       case_code,
       new_status,
       `Status updated via chat command`

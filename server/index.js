@@ -1,10 +1,13 @@
+// Load config first - this initializes environment variables
+import { config } from './config.js';
 import express from 'express';
 import cors from 'cors';
 import casesRouter from './routes/cases.js';
 import chatRouter from './routes/chat.js';
+import { initializeDatabase } from './db/pg-init.js';
 
 const app = express();
-const PORT = 3001;
+const PORT = config.PORT;
 
 // Middleware
 app.use(cors({
@@ -27,7 +30,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log(`API endpoints available at http://localhost:${PORT}/api`);
-});
+// Initialize database and start server
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`API endpoints available at http://localhost:${PORT}/api`);
+    });
+  })
+  .catch((error) => {
+    console.error('Failed to initialize database:', error);
+    process.exit(1);
+  });
