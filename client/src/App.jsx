@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ChatProvider } from './contexts/ChatContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import ChatPage from './pages/ChatPage';
@@ -28,8 +29,9 @@ import MonitoringDashboard from './pages/admin/MonitoringDashboard';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+      <ChatProvider>
+        <BrowserRouter>
+          <Routes>
           {/* Public Pages */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/learn" element={<AboutPoSH />} />
@@ -110,8 +112,9 @@ function App() {
               <ProactiveInsights />
             </ProtectedRoute>
           } />
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </ChatProvider>
     </AuthProvider>
   );
 }

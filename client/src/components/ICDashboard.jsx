@@ -68,6 +68,17 @@ export default function ICDashboard({ onQuickAction }) {
     </button>
   );
 
+  const calculateDaysOpen = (caseItem) => {
+    const dateString = caseItem.reported_at || caseItem.created_at || caseItem.incident_date;
+    const parsedDate = dateString ? new Date(dateString) : null;
+
+    if (!parsedDate || isNaN(parsedDate.getTime())) {
+      return 0;
+    }
+
+    return Math.max(0, Math.floor((Date.now() - parsedDate.getTime()) / (1000 * 60 * 60 * 24)));
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -198,7 +209,7 @@ export default function ICDashboard({ onQuickAction }) {
                   </thead>
                   <tbody className="divide-y divide-warm-100">
                     {recentCases.map((caseItem) => {
-                      const daysOpen = Math.floor((Date.now() - new Date(caseItem.reported_at).getTime()) / (1000 * 60 * 60 * 24));
+                      const daysOpen = calculateDaysOpen(caseItem);
                       const statusColors = {
                         'new': 'bg-blue-50 text-blue-700',
                         'investigating': 'bg-accent-50 text-accent-700',

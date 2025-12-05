@@ -9,6 +9,7 @@ export function ChatProvider({ children }) {
   const [currentMode, setCurrentMode] = useState('employee'); // 'employee' | 'ic'
   const [isTyping, setIsTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingCaseCode, setPendingCaseCode] = useState(null);
 
   // Set IC members to IC mode by default
   useEffect(() => {
@@ -31,6 +32,7 @@ export function ChatProvider({ children }) {
 
   const clearMessages = () => {
     setMessages([]);
+    setPendingCaseCode(null);
   };
 
   const toggleMode = () => {
@@ -47,7 +49,9 @@ export function ChatProvider({ children }) {
     addMessage,
     clearMessages,
     toggleMode,
-    setCurrentMode
+    setCurrentMode,
+    pendingCaseCode,
+    setPendingCaseCode
   };
 
   return (

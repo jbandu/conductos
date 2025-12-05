@@ -7,7 +7,7 @@ import { api } from '../services/api';
 export default function Sidebar() {
   const navigate = useNavigate();
   const { logout, user, isICMember } = useAuth();
-  const { currentMode, setCurrentMode, sidebarOpen, setSidebarOpen, clearMessages } = useChat();
+  const { currentMode, setCurrentMode, sidebarOpen, setSidebarOpen, clearMessages, setPendingCaseCode } = useChat();
   const [recentCases, setRecentCases] = useState([]);
 
   // Force employee mode for non-IC members
@@ -34,6 +34,7 @@ export default function Sidebar() {
 
   const handleNewChat = () => {
     clearMessages();
+    navigate('/chat');
     setSidebarOpen(false);
   };
 
@@ -41,15 +42,14 @@ export default function Sidebar() {
     const newMode = currentMode === 'employee' ? 'ic' : 'employee';
     setCurrentMode(newMode);
     clearMessages();
+    navigate('/chat');
   };
 
   const handleCaseClick = async (caseCode) => {
     setSidebarOpen(false);
-    // Trigger case detail view by adding a message
-    // This will be picked up by ChatLayout
-    if (window.dispatchEvent) {
-      window.dispatchEvent(new CustomEvent('viewCase', { detail: { caseCode } }));
-    }
+    setCurrentMode('ic');
+    setPendingCaseCode(caseCode);
+    navigate('/chat');
   };
 
   const handleLogout = () => {
