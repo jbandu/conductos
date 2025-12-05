@@ -11,9 +11,10 @@ import { getHelpText } from './chatParser.js';
  * @param {string} intent - Parsed intent
  * @param {Object} params - Intent parameters
  * @param {string} mode - Current mode ('employee' or 'ic')
+ * @param {Object} user - Authenticated user
  * @returns {Promise<Object>} - Structured response
  */
-export async function generateResponse(intent, params, mode) {
+export async function generateResponse(intent, params, mode, user = null) {
   switch (intent) {
     case 'COMPLAINT_START':
       return {
@@ -25,7 +26,7 @@ export async function generateResponse(intent, params, mode) {
       };
 
     case 'CASE_LIST':
-      return await handleCaseList();
+      return await handleCaseList(mode, user);
 
     case 'CASE_PENDING':
       return await handleCasePending();
@@ -60,14 +61,24 @@ export async function generateResponse(intent, params, mode) {
 /**
  * Handle CASE_LIST intent
  */
-async function handleCaseList() {
+async function handleCaseList(mode, user) {
   try {
-    const cases = await caseService.getAllCases();
+    let cases;
+
+    // Employees can only see their own cases
+    if (mode === 'employee' && user) {
+      cases = await caseService.getCasesByEmail(user.email);
+    } else {
+      // IC members see all cases
+      cases = await caseService.getAllCases();
+    }
 
     if (cases.length === 0) {
       return {
         type: 'text',
-        content: 'No cases found in the system.'
+        content: mode === 'employee'
+          ? 'You haven\'t filed any complaints yet. Click "I want to report harassment" to file your first complaint.'
+          : 'No cases found in the system.'
       };
     }
 

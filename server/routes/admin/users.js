@@ -1,6 +1,9 @@
 import express from 'express';
+import bcrypt from 'bcrypt';
 import pool from '../../db/pg-init.js';
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
+
+const SALT_ROUNDS = 10;
 
 const router = express.Router();
 
@@ -25,7 +28,7 @@ router.get('/', async (req, res) => {
         u.is_active,
         u.is_super_admin,
         u.organization_id,
-        u.last_login_at,
+        u.last_login,
         u.created_at,
         o.name as organization_name
       FROM users u
@@ -91,9 +94,8 @@ router.get('/:id', async (req, res) => {
         u.is_active,
         u.is_super_admin,
         u.organization_id,
-        u.last_login_at,
+        u.last_login,
         u.created_at,
-        u.updated_at,
         o.name as organization_name
       FROM users u
       LEFT JOIN organizations o ON u.organization_id = o.id
@@ -148,20 +150,22 @@ router.post('/', async (req, res) => {
 
     await client.query('BEGIN');
 
-    // Create user (password should be hashed - for MVP using plaintext)
+    // Hash password before storing
+    const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+
+    // Create user
     const result = await client.query(`
       INSERT INTO users (
         full_name,
         email,
-        password,
+        password_hash,
         role,
         organization_id,
         is_active,
-        created_at,
-        updated_at
-      ) VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())
+        created_at
+      ) VALUES ($1, $2, $3, $4, $5, true, NOW())
       RETURNING id, full_name, email, role, is_active, organization_id, created_at
-    `, [full_name, email, password, role, organization_id || null]);
+    `, [full_name, email, password_hash, role, organization_id || null]);
 
     const newUser = result.rows[0];
 
@@ -248,14 +252,13 @@ router.patch('/:id', async (req, res) => {
       updates.push(`organization_id = $${paramIndex++}`);
     }
 
-    updates.push(`updated_at = NOW()`);
     values.push(id);
 
     const result = await client.query(`
       UPDATE users
       SET ${updates.join(', ')}
       WHERE id = $${paramIndex}
-      RETURNING id, full_name, email, role, is_active, organization_id, updated_at
+      RETURNING id, full_name, email, role, is_active, organization_id
     `, values);
 
     // Log admin action
@@ -321,7 +324,7 @@ router.patch('/:id/status', async (req, res) => {
 
     const result = await client.query(`
       UPDATE users
-      SET is_active = $1, updated_at = NOW()
+      SET is_active = $1
       WHERE id = $2
       RETURNING id, full_name, email, role, is_active
     `, [is_active, id]);
@@ -385,7 +388,7 @@ router.delete('/:id', async (req, res) => {
     // Soft delete
     await client.query(`
       UPDATE users
-      SET is_active = false, updated_at = NOW()
+      SET is_active = false
       WHERE id = $1
     `, [id]);
 

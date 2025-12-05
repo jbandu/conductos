@@ -14,13 +14,17 @@ function parseConnectionString(connString) {
 
   const dbUrl = new URL(connString);
 
+  // Enable SSL for production OR for Render databases (which always require SSL)
+  const isRenderDb = dbUrl.hostname.includes('render.com');
+  const requiresSsl = config.NODE_ENV === 'production' || isRenderDb;
+
   return {
     host: dbUrl.hostname,
     port: dbUrl.port,
     database: dbUrl.pathname.slice(1), // Remove leading '/'
     user: dbUrl.username,
     password: decodeURIComponent(dbUrl.password),
-    ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
+    ssl: requiresSsl ? { rejectUnauthorized: false } : undefined
   };
 }
 
@@ -203,6 +207,18 @@ export async function initializeDatabase() {
       )
     `);
 
+    // Create password reset tokens table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token VARCHAR(255) UNIQUE NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        used_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Create indexes for admin tables
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_ic_members_org ON ic_members(organization_id)
@@ -215,6 +231,12 @@ export async function initializeDatabase() {
     `);
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_token ON password_reset_tokens(token)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user ON password_reset_tokens(user_id)
     `);
 
     console.log('Database schema initialized successfully');

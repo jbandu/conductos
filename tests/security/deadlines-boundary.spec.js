@@ -72,7 +72,7 @@ test.describe('90-Day Deadline - Critical Legal Compliance @critical', () => {
       expect(responseBody.error || responseBody.message).toMatch(/future|invalid|cannot/i);
     });
 
-    test('MUST allow today's date (boundary case)', async ({ page }) => {
+    test('MUST allow today\'s date (boundary case)', async ({ page }) => {
       // Boundary: Today is valid
 
       await page.goto('/');
@@ -231,7 +231,7 @@ test.describe('90-Day Deadline - Critical Legal Compliance @critical', () => {
       // Cases due today should show 0 days remaining or "Due today"
       // They should NOT be marked as overdue
       if (pageContent.includes('days remaining')) {
-        const has ZeroDays = pageContent.includes('0 days') || pageContent.includes('Due today');
+        const hasZeroDays = pageContent.includes('0 days') || pageContent.includes('Due today');
         const hasOverdue = pageContent.includes('Overdue') || pageContent.includes('overdue');
 
         // If we have cases, they should be "due today" not "overdue"

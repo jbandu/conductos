@@ -10,12 +10,14 @@ const router = express.Router();
 const SALT_ROUNDS = 10;
 
 // Rate limiting for auth endpoints
+// More lenient for demo/testing environments
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 requests per window
+  max: config.NODE_ENV === 'production' ? 30 : 100, // 30 in production, 100 in dev
   message: 'Too many authentication attempts, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => config.NODE_ENV === 'development' && req.ip === '::1', // Skip for localhost in dev
 });
 
 // Helper function to generate JWT token

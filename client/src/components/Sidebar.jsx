@@ -167,8 +167,20 @@ export default function Sidebar() {
           </div>
         )}
 
-        {/* Logout Button */}
-        <div className="p-4 border-t border-warm-700">
+        {/* Profile & Logout Section */}
+        <div className="p-4 border-t border-warm-700 space-y-2">
+          <button
+            onClick={() => {
+              navigate('/profile');
+              setSidebarOpen(false);
+            }}
+            className="w-full px-4 py-2.5 bg-warm-800 hover:bg-warm-700 rounded-lg transition-colors min-h-[44px] flex items-center justify-center gap-2 text-warm-300 hover:text-white"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            My Profile
+          </button>
           <button
             onClick={handleLogout}
             className="w-full px-4 py-2.5 bg-warm-800 hover:bg-warm-700 rounded-lg transition-colors min-h-[44px] flex items-center justify-center gap-2 text-warm-300 hover:text-white"

@@ -9,8 +9,12 @@ import casesRouter from './routes/cases.js';
 import chatRouter from './routes/chat.js';
 import dashboardRouter from './routes/dashboard.js';
 import authRouter from './routes/auth.js';
+import passwordResetRouter from './routes/password-reset.js';
+import profileRouter from './routes/profile.js';
 import adminUsersRouter from './routes/admin/users.js';
 import adminICRouter from './routes/admin/ic-composition.js';
+import adminAuditLogRouter from './routes/admin/audit-log.js';
+import adminOrganizationRouter from './routes/admin/organization.js';
 import copilotRouter from './routes/copilot.js';
 import documentsRouter from './routes/documents.js';
 import patternsRouter from './routes/patterns.js';
@@ -42,11 +46,15 @@ app.use(requestLogger);
 
 // API Routes (must come before static files)
 app.use('/api/auth', authRouter);
+app.use('/api/auth', passwordResetRouter);
+app.use('/api/profile', profileRouter);
 app.use('/api/cases', casesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/admin/users', adminUsersRouter);
 app.use('/api/admin/ic-composition', adminICRouter);
+app.use('/api/admin/audit-log', adminAuditLogRouter);
+app.use('/api/admin/organization', adminOrganizationRouter);
 app.use('/api/copilot', copilotRouter);
 app.use('/api/orchestrator', orchestratorRouter);
 app.use('/api/documents', documentsRouter);
