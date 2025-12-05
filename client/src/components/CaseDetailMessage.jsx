@@ -1,0 +1,190 @@
+import React, { useState } from 'react';
+
+const STATUS_STYLES = {
+  new: 'bg-blue-100 text-blue-800',
+  under_review: 'bg-purple-100 text-purple-800',
+  conciliation: 'bg-yellow-100 text-yellow-800',
+  investigating: 'bg-orange-100 text-orange-800',
+  decision_pending: 'bg-red-100 text-red-800',
+  closed: 'bg-green-100 text-green-800'
+};
+
+const STATUS_LABELS = {
+  new: 'New',
+  under_review: 'Under Review',
+  conciliation: 'Conciliation',
+  investigating: 'Investigating',
+  decision_pending: 'Decision Pending',
+  closed: 'Closed'
+};
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+function formatDateTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function StatusTimeline({ history }) {
+  if (!history || history.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6">
+      <h4 className="text-sm font-semibold text-gray-700 mb-3">Status History</h4>
+      <div className="space-y-3">
+        {history.map((entry, index) => (
+          <div key={entry.id} className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'}`} />
+              {index !== history.length - 1 && (
+                <div className="w-0.5 h-full bg-gray-200 mt-1" />
+              )}
+            </div>
+
+            <div className="flex-1 pb-4">
+              <div className="flex items-center gap-2 mb-1">
+                {entry.old_status && (
+                  <>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[entry.old_status]}`}>
+                      {STATUS_LABELS[entry.old_status]}
+                    </span>
+                    <span className="text-gray-400">→</span>
+                  </>
+                )}
+                <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[entry.new_status]}`}>
+                  {STATUS_LABELS[entry.new_status]}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mb-1">{entry.notes}</p>
+              <p className="text-xs text-gray-400">{formatDateTime(entry.changed_at)}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function CaseDetailMessage({ caseData, history }) {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const isOverdue = caseData.is_overdue;
+  const daysRemaining = caseData.days_remaining;
+  const descriptionPreview = caseData.description.slice(0, 200);
+  const needsTruncation = caseData.description.length > 200;
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-6 bg-white">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {caseData.case_code}
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_STYLES[caseData.status]}`}>
+              {STATUS_LABELS[caseData.status]}
+            </span>
+            {caseData.is_anonymous && (
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                🔒 Anonymous
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+        <div>
+          <p className="text-xs text-gray-500 mb-1">Filed</p>
+          <p className="text-sm font-medium text-gray-900">{formatDate(caseData.created_at)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 mb-1">Incident Date</p>
+          <p className="text-sm font-medium text-gray-900">{formatDate(caseData.incident_date)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 mb-1">Deadline</p>
+          <p className="text-sm font-medium text-gray-900">{formatDate(caseData.deadline_date)}</p>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        {isOverdue ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span className="text-sm font-medium text-red-900">
+              ⚠️ This case is {Math.abs(daysRemaining)} days overdue
+            </span>
+          </div>
+        ) : daysRemaining === 0 ? (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-center gap-2">
+            <span className="text-sm font-medium text-yellow-900">
+              📅 Deadline is today
+            </span>
+          </div>
+        ) : daysRemaining <= 7 ? (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex items-center gap-2">
+            <span className="text-sm font-medium text-orange-900">
+              ⚡ {daysRemaining} days remaining
+            </span>
+          </div>
+        ) : (
+          <div className="text-sm text-gray-600">
+            {daysRemaining} days remaining until deadline
+          </div>
+        )}
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-700 mb-2">Description</h3>
+        <p className="text-sm text-gray-600 whitespace-pre-wrap">
+          {showFullDescription || !needsTruncation ? caseData.description : descriptionPreview + '...'}
+        </p>
+        {needsTruncation && (
+          <button
+            onClick={() => setShowFullDescription(!showFullDescription)}
+            className="text-sm text-blue-600 hover:text-blue-700 mt-2 font-medium"
+          >
+            {showFullDescription ? 'Show less' : 'Show more'}
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+        <div>
+          <p className="text-xs text-gray-500 mb-1">Conciliation Requested</p>
+          <p className="text-sm font-medium text-gray-900">
+            {caseData.conciliation_requested ? 'Yes' : 'No'}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 mb-1">Complainant</p>
+          <p className="text-sm font-medium text-gray-900">
+            {caseData.is_anonymous
+              ? `${caseData.anonymous_alias || 'Anonymous'} (Limited disclosure)`
+              : caseData.complainant_name
+            }
+          </p>
+        </div>
+      </div>
+
+      <StatusTimeline history={history} />
+    </div>
+  );
+}

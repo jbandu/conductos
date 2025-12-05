@@ -5,6 +5,9 @@ import QuickChips from './QuickChips';
 import TypingIndicator from './TypingIndicator';
 import Sidebar from './Sidebar';
 import IntakeFlow from './IntakeFlow';
+import CaseListMessage from './CaseListMessage';
+import CaseDetailMessage from './CaseDetailMessage';
+import StatusUpdateConfirm from './StatusUpdateConfirm';
 
 const EMPLOYEE_CHIPS = [
   "I want to report harassment",
@@ -56,13 +59,9 @@ export default function ChatLayout() {
         if (type === 'intake_start') {
           setShowIntakeFlow(true);
           addMessage('system', content.message);
-        } else if (type === 'case_list') {
-          const summary = content.summary || `Found ${content.cases?.length || 0} cases`;
-          addMessage('system', summary);
-        } else if (type === 'case_detail') {
-          addMessage('system', content.message);
-        } else if (type === 'case_update_success') {
-          addMessage('system', content.message);
+        } else if (type === 'case_list' || type === 'case_detail' || type === 'case_update_success') {
+          // Store full response data for rich components
+          addMessage('system', { type, ...content });
         } else if (type === 'text') {
           addMessage('system', content);
         } else if (type === 'error') {
@@ -164,14 +163,53 @@ export default function ChatLayout() {
             </div>
           ) : (
             <div className="py-4">
-              {messages.map((msg) => (
-                <ChatMessage
-                  key={msg.id}
-                  type={msg.type}
-                  content={msg.content}
-                  timestamp={msg.timestamp}
-                />
-              ))}
+              {messages.map((msg) => {
+                // Check if this is a rich message with special components
+                if (msg.type === 'system' && typeof msg.content === 'object' && msg.content.type) {
+                  const { type, cases, summary, case: caseData, history, message } = msg.content;
+
+                  return (
+                    <div key={msg.id} className="px-4 mb-4">
+                      {type === 'case_list' && (
+                        <CaseListMessage
+                          cases={cases || []}
+                          summary={summary}
+                          onCaseClick={(caseCode) => {
+                            addMessage('user', `status ${caseCode}`);
+                            processMessage(`status ${caseCode}`);
+                          }}
+                        />
+                      )}
+                      {type === 'case_detail' && caseData && (
+                        <CaseDetailMessage
+                          caseData={caseData}
+                          history={history || []}
+                        />
+                      )}
+                      {type === 'case_update_success' && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-sm font-medium text-green-900">{message}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                // Regular text message
+                return (
+                  <ChatMessage
+                    key={msg.id}
+                    type={msg.type}
+                    content={msg.content}
+                    timestamp={msg.timestamp}
+                  />
+                );
+              })}
               {isTyping && <TypingIndicator />}
               {showIntakeFlow && <IntakeFlow onComplete={handleIntakeComplete} />}
               <div ref={messagesEndRef} />
