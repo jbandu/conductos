@@ -42,6 +42,23 @@ export async function initializeDatabase() {
   try {
     console.log('Initializing database schema...');
 
+    // Create organizations table first (referenced by users)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS organizations (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        domain VARCHAR(255) UNIQUE,
+        industry VARCHAR(100),
+        employee_count INTEGER,
+        address TEXT,
+        city VARCHAR(100),
+        state VARCHAR(100),
+        district_officer_email VARCHAR(255),
+        settings JSONB DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Create users table
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -49,7 +66,12 @@ export async function initializeDatabase() {
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
-        role VARCHAR(50) NOT NULL CHECK(role IN ('employee', 'ic_member')),
+        role VARCHAR(50) NOT NULL CHECK(role IN ('employee', 'ic_member', 'hr_admin')),
+        is_super_admin BOOLEAN DEFAULT FALSE,
+        is_active BOOLEAN DEFAULT TRUE,
+        organization_id INTEGER REFERENCES organizations(id),
+        created_by INTEGER REFERENCES users(id),
+        deactivated_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_login TIMESTAMP
       )
@@ -59,6 +81,39 @@ export async function initializeDatabase() {
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)
     `);
+
+    // Migrate existing users table to add new columns (idempotent)
+    try {
+      await client.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS is_super_admin BOOLEAN DEFAULT FALSE
+      `);
+      await client.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE
+      `);
+      await client.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS organization_id INTEGER REFERENCES organizations(id)
+      `);
+      await client.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS created_by INTEGER REFERENCES users(id)
+      `);
+      await client.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMP
+      `);
+
+      // Update role constraint to include hr_admin
+      await client.query(`
+        ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check
+      `);
+      await client.query(`
+        ALTER TABLE users ADD CONSTRAINT users_role_check
+        CHECK(role IN ('employee', 'ic_member', 'hr_admin'))
+      `);
+
+      console.log('  ✓ Migrated users table with new columns');
+    } catch (err) {
+      // Columns might already exist, continue
+      console.log('  ℹ Users table migration skipped (columns may already exist)');
+    }
 
     // Create cases table
     await client.query(`
@@ -100,6 +155,68 @@ export async function initializeDatabase() {
     // Create index on case_id in status_history
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_status_history_case_id ON status_history(case_id)
+    `);
+
+    // Create IC members table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ic_members (
+        id SERIAL PRIMARY KEY,
+        organization_id INTEGER NOT NULL REFERENCES organizations(id),
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        role VARCHAR(50) NOT NULL CHECK(role IN ('presiding_officer', 'internal_member', 'external_member')),
+        is_active BOOLEAN DEFAULT TRUE,
+        appointed_date DATE NOT NULL,
+        term_end_date DATE,
+        expertise VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_by INTEGER REFERENCES users(id),
+        UNIQUE(organization_id, user_id)
+      )
+    `);
+
+    // Create admin audit log table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_audit_log (
+        id SERIAL PRIMARY KEY,
+        admin_id INTEGER NOT NULL REFERENCES users(id),
+        action VARCHAR(100) NOT NULL,
+        target_type VARCHAR(50),
+        target_id INTEGER,
+        old_value JSONB,
+        new_value JSONB,
+        ip_address VARCHAR(45),
+        user_agent TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create invitations table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS invitations (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) NOT NULL,
+        role VARCHAR(50) NOT NULL,
+        token VARCHAR(255) UNIQUE NOT NULL,
+        invited_by INTEGER NOT NULL REFERENCES users(id),
+        organization_id INTEGER NOT NULL REFERENCES organizations(id),
+        expires_at TIMESTAMP NOT NULL,
+        accepted_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create indexes for admin tables
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_ic_members_org ON ic_members(organization_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_ic_members_user ON ic_members(user_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_audit_log_admin ON admin_audit_log(admin_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token)
     `);
 
     console.log('Database schema initialized successfully');

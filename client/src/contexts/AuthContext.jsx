@@ -79,8 +79,10 @@ export function AuthProvider({ children }) {
 
   const hasRole = (role) => {
     if (!user) return false;
-    // IC members can access everything
-    if (user.role === 'ic_member') return true;
+    // Admins can access everything
+    if (user.role === 'hr_admin') return true;
+    // IC members can access everything except admin
+    if (user.role === 'ic_member' && role !== 'hr_admin') return true;
     // Employees can only access employee features
     return user.role === role;
   };
@@ -91,6 +93,8 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     isEmployee: user?.role === 'employee',
     isICMember: user?.role === 'ic_member',
+    isAdmin: user?.role === 'hr_admin',
+    isSuperAdmin: user?.is_super_admin === true,
     login,
     signup,
     logout,

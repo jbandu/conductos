@@ -19,6 +19,7 @@
     "db:seed": "cd server && node db/seed.js",
     "seed:demo": "cd server && node scripts/seedDemoData.js",
     "seed:users": "cd server && node scripts/seedUsers.js",
+    "seed:admin": "cd server && node scripts/seedAdmin.js",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
