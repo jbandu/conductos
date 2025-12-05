@@ -140,7 +140,7 @@ export default function KnowledgeBase() {
                 <div className="flex items-center gap-4">
                   <span>Uploaded by {doc.uploaded_by_name || 'System'}</span>
                   <span>•</span>
-                  <span>{new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                  <span>{new Date(doc.created_at).toLocaleDateString()}</span>
                 </div>
                 {doc.file_url && (
                   <a

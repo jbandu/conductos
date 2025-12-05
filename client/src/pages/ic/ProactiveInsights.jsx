@@ -131,7 +131,7 @@ export default function ProactiveInsights() {
                     <div className="text-sm text-gray-600">
                       <span className="font-medium capitalize">{insight.category.replace('_', ' ')}</span>
                       {' • '}
-                      Generated {new Date(insight.generated_at).toLocaleDateString()}
+                      Generated {new Date(insight.created_at).toLocaleDateString()}
                     </div>
                     {insight.status !== 'resolved' && (
                       <div className="flex gap-2">
