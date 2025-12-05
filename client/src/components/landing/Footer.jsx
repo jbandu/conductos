@@ -30,6 +30,11 @@ export default function Footer() {
               <h3 className="text-white font-semibold mb-3">Quick Links</h3>
               <ul className="space-y-2">
                 <li>
+                  <Link to="/learn" className="text-sm text-warm-400 hover:text-primary-400 transition-colors">
+                    About PoSH Act
+                  </Link>
+                </li>
+                <li>
                   <Link to="#" className="text-sm text-warm-400 hover:text-primary-400 transition-colors">
                     Privacy Policy
                   </Link>
