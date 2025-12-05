@@ -9,6 +9,8 @@ import casesRouter from './routes/cases.js';
 import chatRouter from './routes/chat.js';
 import dashboardRouter from './routes/dashboard.js';
 import authRouter from './routes/auth.js';
+import adminUsersRouter from './routes/admin/users.js';
+import adminICRouter from './routes/admin/ic-composition.js';
 import { initializeDatabase } from './db/pg-init.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,6 +33,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/cases', casesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/admin/users', adminUsersRouter);
+app.use('/api/admin/ic-composition', adminICRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -11,15 +11,38 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch actual stats from API
-    setStats({
-      totalUsers: 0,
-      activeUsers: 0,
-      icMembers: 0,
-      recentActivity: []
-    });
-    setIsLoading(false);
+    fetchStats();
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+
+      // Fetch users
+      const usersResponse = await fetch('/api/admin/users', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const usersData = await usersResponse.json();
+
+      // Fetch IC composition
+      const icResponse = await fetch('/api/admin/ic-composition', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const icData = await icResponse.json();
+
+      setStats({
+        totalUsers: usersData.users.length,
+        activeUsers: usersData.users.filter(u => u.is_active).length,
+        icMembers: icData.composition.total_active,
+        recentActivity: []
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const statCards = [
     {

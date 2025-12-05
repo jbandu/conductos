@@ -12,6 +12,8 @@ import EmployeeSignup from './pages/auth/EmployeeSignup';
 import ICLogin from './pages/auth/ICLogin';
 import AdminLogin from './pages/auth/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagement from './pages/admin/UserManagement';
+import ICComposition from './pages/admin/ICComposition';
 
 function App() {
   return (
@@ -42,6 +44,16 @@ function App() {
           <Route path="/admin/dashboard" element={
             <ProtectedRoute requiredRole="hr_admin">
               <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/users" element={
+            <ProtectedRoute requiredRole="hr_admin">
+              <UserManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/ic-composition" element={
+            <ProtectedRoute requiredRole="hr_admin">
+              <ICComposition />
             </ProtectedRoute>
           } />
         </Routes>
