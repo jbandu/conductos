@@ -1,0 +1,13 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install && npm run build --workspace=client"
+
+[deploy]
+startCommand = "cd server && npm install && node index.js"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[deploy.healthcheck]
+path = "/api/health"
+timeout = 300
+interval = 10
