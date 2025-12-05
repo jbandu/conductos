@@ -12,7 +12,7 @@ router.get('/', authenticateToken, async (req, res) => {
       SELECT d.*, u.full_name as uploaded_by_name
       FROM documents d
       LEFT JOIN users u ON d.uploaded_by = u.id
-      ORDER BY d.uploaded_at DESC
+      ORDER BY d.created_at DESC
     `);
     res.json(result.rows);
   } catch (error) {
@@ -36,7 +36,7 @@ router.get('/search', authenticateToken, async (req, res) => {
       FROM documents d
       LEFT JOIN users u ON d.uploaded_by = u.id
       WHERE d.title ILIKE $1 OR d.description ILIKE $1 OR d.content ILIKE $1
-      ORDER BY d.uploaded_at DESC
+      ORDER BY d.created_at DESC
     `, [`%${q}%`]);
 
     res.json(result.rows);

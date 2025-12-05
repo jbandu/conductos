@@ -11,7 +11,7 @@ router.get('/', authenticateToken, async (req, res) => {
     // Fetch insights directly from database
     const result = await db.query(`
       SELECT * FROM insights
-      ORDER BY generated_at DESC
+      ORDER BY created_at DESC
     `);
     res.json(result.rows);
   } catch (error) {
