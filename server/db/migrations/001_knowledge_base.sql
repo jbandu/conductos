@@ -1,5 +1,21 @@
--- Knowledge base schema for PoSH resources
-CREATE EXTENSION IF NOT EXISTS vector;
+-- Ensure a usable "vector" type. Prefer the extension when available,
+-- but fall back to a compatible domain if the extension is not installed
+-- (e.g., hosted Postgres instances without pgvector).
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'vector') THEN
+    BEGIN
+      CREATE EXTENSION IF NOT EXISTS vector;
+    EXCEPTION
+      WHEN undefined_file THEN
+        RAISE NOTICE 'pgvector extension not available, creating vector domain for compatibility';
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'vector') THEN
+          CREATE DOMAIN vector AS double precision[];
+        END IF;
+    END;
+  END IF;
+END
+$$;
 
 CREATE TABLE IF NOT EXISTS legal_documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,7 +45,7 @@ CREATE TABLE IF NOT EXISTS legal_sections (
     'section', 'subsection', 'clause', 'proviso', 'explanation', 'schedule'
   )),
   keywords TEXT[],
-  embedding vector(1536),
+  embedding vector,
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -53,7 +69,7 @@ CREATE TABLE IF NOT EXISTS case_law (
   distinguished_by TEXT[],
   overruled_by TEXT,
   relevance_score INTEGER DEFAULT 5,
-  embedding vector(1536),
+  embedding vector,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -74,7 +90,7 @@ CREATE TABLE IF NOT EXISTS playbooks (
   sample_language TEXT,
   difficulty_level TEXT CHECK(difficulty_level IN ('basic', 'intermediate', 'advanced')),
   source TEXT DEFAULT 'KelpHR',
-  embedding vector(1536),
+  embedding vector,
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
