@@ -8,6 +8,49 @@ export default function KnowledgeBase() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fallbackDocuments = [
+    {
+      id: 'kb-1',
+      title: 'Annual Compliance Checklist',
+      description: 'Step-by-step compliance verification before each fiscal year closes.',
+      category: 'compliance',
+      tags: ['compliance', 'annual', 'checklist'],
+      uploaded_by_name: 'System Administrator',
+      created_at: '2025-12-05T00:00:00Z',
+      file_url: '#'
+    },
+    {
+      id: 'kb-2',
+      title: 'Complaint Investigation Framework',
+      description: 'Investigation playbook covering evidence collection and interview guidance.',
+      category: 'investigation',
+      tags: ['investigation', 'procedures', 'compliance'],
+      uploaded_by_name: 'System Administrator',
+      created_at: '2025-12-05T00:00:00Z',
+      file_url: '#'
+    },
+    {
+      id: 'kb-3',
+      title: 'IC Committee Best Practices',
+      description: 'Role clarity, quorum rules, and communication templates for IC members.',
+      category: 'training',
+      tags: ['ic', 'best-practices', 'training'],
+      uploaded_by_name: 'System Administrator',
+      created_at: '2025-12-05T00:00:00Z',
+      file_url: '#'
+    },
+    {
+      id: 'kb-4',
+      title: 'POSH Act 2013 - Complete Guide',
+      description: 'Legal reference covering obligations, timelines, and reporting pathways.',
+      category: 'legal',
+      tags: ['posh', 'legal', 'compliance'],
+      uploaded_by_name: 'System Administrator',
+      created_at: '2025-12-05T00:00:00Z',
+      file_url: '#'
+    }
+  ];
+
   useEffect(() => {
     fetchDocuments();
   }, []);
@@ -17,8 +60,10 @@ export default function KnowledgeBase() {
       setLoading(true);
       const data = await api.getDocuments();
       setDocuments(data);
+      setError(null);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Unable to load documents');
+      setDocuments(fallbackDocuments);
     } finally {
       setLoading(false);
     }
@@ -34,8 +79,14 @@ export default function KnowledgeBase() {
       setLoading(true);
       const data = await api.searchDocuments(searchQuery);
       setDocuments(data);
+      setError(null);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Unable to search documents');
+      const filteredFallback = fallbackDocuments.filter((doc) => {
+        const haystack = `${doc.title} ${doc.description} ${doc.tags?.join(' ')}`.toLowerCase();
+        return haystack.includes(searchQuery.toLowerCase());
+      });
+      setDocuments(filteredFallback);
     } finally {
       setLoading(false);
     }
