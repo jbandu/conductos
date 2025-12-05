@@ -191,7 +191,7 @@ export default function MonitoringDashboard() {
                           {req.method}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {req.endpoint}
+                          {req.path}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <span
@@ -209,7 +209,7 @@ export default function MonitoringDashboard() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {req.duration_ms}ms
+                          {req.response_time_ms}ms
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                           {new Date(req.timestamp).toLocaleTimeString()}

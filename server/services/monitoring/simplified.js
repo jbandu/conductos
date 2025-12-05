@@ -7,9 +7,9 @@ export async function getDashboardMetrics() {
       SELECT
         COUNT(*) AS total_requests,
         COUNT(*) FILTER (WHERE status_code >= 500) AS errors,
-        AVG(duration_ms) AS avg_response_time,
-        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY duration_ms) AS p95,
-        PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms) AS p99
+        AVG(response_time_ms) AS avg_response_time,
+        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY response_time_ms) AS p95,
+        PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY response_time_ms) AS p99
       FROM api_request_logs
       WHERE timestamp > NOW() - INTERVAL '24 hours'
     `);
@@ -29,7 +29,7 @@ export async function getDashboardMetrics() {
 
     // Get recent requests for the table
     const recentRequestsResult = await db.query(`
-      SELECT method, endpoint, status_code, duration_ms, timestamp
+      SELECT method, path, status_code, response_time_ms, timestamp
       FROM api_request_logs
       ORDER BY timestamp DESC
       LIMIT 20
