@@ -51,9 +51,16 @@ export default function ChatLayout() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const processMessage = async (message) => {
+  const processMessage = async (message, options = {}) => {
+    const { showTypingDelay = false } = options;
+
     try {
       setIsTyping(true);
+
+      // Add a small delay for quick chip clicks to show thinking indicator
+      if (showTypingDelay) {
+        await new Promise(resolve => setTimeout(resolve, 1200));
+      }
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -103,7 +110,7 @@ export default function ChatLayout() {
 
   const handleChipSelect = (chip) => {
     addMessage('user', chip);
-    processMessage(chip);
+    processMessage(chip, { showTypingDelay: true });
   };
 
   const handleIntakeComplete = () => {

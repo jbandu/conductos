@@ -2,10 +2,15 @@
 import { config } from './config.js';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import casesRouter from './routes/cases.js';
 import chatRouter from './routes/chat.js';
 import dashboardRouter from './routes/dashboard.js';
 import { initializeDatabase } from './db/pg-init.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = config.PORT;
@@ -19,7 +24,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Routes
+// API Routes (must come before static files)
 app.use('/api/cases', casesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/dashboard', dashboardRouter);
@@ -28,6 +33,17 @@ app.use('/api/dashboard', dashboardRouter);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'KelpHR ConductOS API is running' });
 });
+
+// Serve static files from client build (production only)
+if (config.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../client/dist');
+  app.use(express.static(clientBuildPath));
+
+  // Serve index.html for any non-API routes (SPA support)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
