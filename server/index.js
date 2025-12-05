@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import casesRouter from './routes/cases.js';
 import chatRouter from './routes/chat.js';
+import dashboardRouter from './routes/dashboard.js';
 import { initializeDatabase } from './db/pg-init.js';
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.json());
 // Routes
 app.use('/api/cases', casesRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/dashboard', dashboardRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
