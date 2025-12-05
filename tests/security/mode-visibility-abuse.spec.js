@@ -142,7 +142,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
       const otherUserCase = await request.post('/api/cases', {
         data: {
           incident_date: '2025-01-15',
-          description: 'This is another user's case that should not be accessible via brute force.',
+          description: 'This is another user\'s case that should not be accessible via brute force.',
           is_anonymous: false,
           complainant_name: 'Other User',
           complainant_email: 'other@example.com',
