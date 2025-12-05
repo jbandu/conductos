@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { MonitoringService } from '../services/monitoring/index.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
-import { db } from '../db/client.js';
+import db from '../db/pg-init.js';
 
 const router = Router();
 const monitoring = new MonitoringService();

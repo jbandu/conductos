@@ -1,4 +1,4 @@
-import { db } from '../../db/client.js';
+import db from '../../db/pg-init.js';
 import { notificationService } from '../notificationService.js';
 
 const TOKEN_PRICING = {

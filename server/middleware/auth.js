@@ -35,3 +35,15 @@ export const requireRole = (allowedRoles) => {
     next();
   };
 };
+
+// Convenience aliases
+export const requireAuth = authenticateToken;
+export const requireAdmin = (req, res, next) => {
+  authenticateToken(req, res, (err) => {
+    if (err) return next(err);
+    if (req.user.role !== 'admin' && !req.user.is_super_admin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    next();
+  });
+};

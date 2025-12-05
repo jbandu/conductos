@@ -1,5 +1,5 @@
 import webpush from 'web-push';
-import { db } from '../../db/client.js';
+import db from '../../db/pg-init.js';
 
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
