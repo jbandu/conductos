@@ -1,11 +1,12 @@
 [phases.setup]
-nixPkgs = ["nodejs_18"]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
 cmds = ["npm ci"]
 
 [phases.build]
 cmds = ["npm run build --workspace=client"]
+cacheDirectories = []
 
 [start]
 cmd = "npm start --workspace=server"
