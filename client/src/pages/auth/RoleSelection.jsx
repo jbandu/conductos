@@ -35,7 +35,7 @@ export default function RoleSelection() {
           </div>
 
           {/* Role Cards */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* Employee Card */}
             <Link
               to="/login/employee"
@@ -81,6 +81,32 @@ export default function RoleSelection() {
                 </p>
                 <div className="inline-flex items-center text-accent-600 font-medium group-hover:text-accent-700">
                   Continue as IC Member
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+
+            {/* HR Admin Card */}
+            <Link
+              to="/login/admin"
+              className="bg-white rounded-xl border-2 border-warm-200 hover:border-indigo-400 p-8 transition-all hover:shadow-lg group"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition-colors">
+                  <svg className="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-warm-900 mb-3">
+                  HR Admin
+                </h2>
+                <p className="text-warm-600 mb-6">
+                  Manage users, IC composition, and organization settings
+                </p>
+                <div className="inline-flex items-center text-indigo-600 font-medium group-hover:text-indigo-700">
+                  Continue as Admin
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>

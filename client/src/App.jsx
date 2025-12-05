@@ -10,6 +10,8 @@ import RoleSelection from './pages/auth/RoleSelection';
 import EmployeeLogin from './pages/auth/EmployeeLogin';
 import EmployeeSignup from './pages/auth/EmployeeSignup';
 import ICLogin from './pages/auth/ICLogin';
+import AdminLogin from './pages/auth/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function App() {
   return (
@@ -26,12 +28,20 @@ function App() {
           <Route path="/login" element={<RoleSelection />} />
           <Route path="/login/employee" element={<EmployeeLogin />} />
           <Route path="/login/ic" element={<ICLogin />} />
+          <Route path="/login/admin" element={<AdminLogin />} />
           <Route path="/signup/employee" element={<EmployeeSignup />} />
 
           {/* Application */}
           <Route path="/chat" element={
             <ProtectedRoute>
               <ChatPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Admin Panel */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute requiredRole="hr_admin">
+              <AdminDashboard />
             </ProtectedRoute>
           } />
         </Routes>
