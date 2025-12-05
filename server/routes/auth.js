@@ -10,10 +10,10 @@ const router = express.Router();
 const SALT_ROUNDS = 10;
 
 // Rate limiting for auth endpoints
-// More lenient in development for testing
+// More lenient for demo/testing environments
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: config.NODE_ENV === 'production' ? 5 : 100, // 5 in production, 100 in dev
+  max: config.NODE_ENV === 'production' ? 30 : 100, // 30 in production, 100 in dev
   message: 'Too many authentication attempts, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
