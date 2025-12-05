@@ -10,11 +10,19 @@ export default function ProactiveInsights() {
     fetchInsights();
   }, []);
 
+  const normalizeInsight = (insight = {}) => ({
+    ...insight,
+    status: insight?.status || 'unknown',
+    category: insight?.category || 'case_management',
+    priority: insight?.priority || 'low',
+    recommendation: insight?.recommendation || insight?.recommended_action || insight?.recommendations?.join(', ')
+  });
+
   const fetchInsights = async () => {
     try {
       setLoading(true);
       const data = await api.getInsights();
-      setInsights(data);
+      setInsights((data || []).map(normalizeInsight));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -49,6 +57,11 @@ export default function ProactiveInsights() {
       'resolved': 'bg-green-100 text-green-700'
     };
     return colors[status] || 'bg-gray-100 text-gray-700';
+  };
+
+  const formatLabel = (value, fallback = '') => {
+    const label = value ?? fallback;
+    return typeof label === 'string' ? label.replace('_', ' ') : String(label);
   };
 
   const getCategoryIcon = (category) => {
@@ -114,9 +127,9 @@ export default function ProactiveInsights() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-xl font-semibold text-gray-900">{insight.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
-                      {insight.status.replace('_', ' ')}
-                    </span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
+                        {formatLabel(insight.status, 'unknown')}
+                      </span>
                   </div>
                   <p className="text-gray-700 mb-4">{insight.description}</p>
 
@@ -129,7 +142,7 @@ export default function ProactiveInsights() {
 
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600">
-                      <span className="font-medium capitalize">{insight.category.replace('_', ' ')}</span>
+                      <span className="font-medium capitalize">{formatLabel(insight.category, 'case management')}</span>
                       {' • '}
                       Generated {new Date(insight.created_at).toLocaleDateString()}
                     </div>

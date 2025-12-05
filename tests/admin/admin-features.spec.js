@@ -1,13 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { loginAs } from '../helpers/apiMocks';
 
 test.describe('Admin Features', () => {
   test.beforeEach(async ({ page }) => {
-    // Login as admin
-    await page.goto('/login/admin');
-    await page.fill('input[type="email"]', 'admin@demo.kelphr.com');
-    await page.fill('input[type="password"]', 'Admin@123456');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/admin/dashboard');
+    await loginAs(page, 'admin');
   });
 
   test.describe('Admin Dashboard', () => {
@@ -23,6 +19,23 @@ test.describe('Admin Features', () => {
       await expect(page.locator('a[href="/admin/ic-composition"]')).toBeVisible();
       await expect(page.locator('a[href="/admin/audit-log"]')).toBeVisible();
       await expect(page.locator('a[href="/admin/organization"]')).toBeVisible();
+    });
+
+    test('sidebar links should navigate to correct admin pages', async ({ page }) => {
+      const navigationChecks = [
+        { link: 'a[href="/admin/dashboard"]', expected: 'Admin Dashboard' },
+        { link: 'a[href="/admin/users"]', expected: 'User Management' },
+        { link: 'a[href="/admin/ic-composition"]', expected: 'IC Composition' },
+        { link: 'a[href="/admin/organization"]', expected: 'Organization Settings' },
+        { link: 'a[href="/admin/audit-log"]', expected: 'Audit Log' },
+        { link: 'a[href="/admin/external-members"]', expected: 'External IC Members' },
+        { link: 'a[href="/admin/monitoring"]', expected: 'System Monitoring' }
+      ];
+
+      for (const { link, expected } of navigationChecks) {
+        await page.click(link);
+        await expect(page.locator(`text=${expected}`)).toBeVisible();
+      }
     });
   });
 
