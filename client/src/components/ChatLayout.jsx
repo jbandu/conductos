@@ -63,9 +63,15 @@ export default function ChatLayout() {
         await new Promise(resolve => setTimeout(resolve, 1200));
       }
 
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      };
+
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ message, mode: currentMode })
       });
 

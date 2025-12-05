@@ -1,12 +1,14 @@
 import express from 'express';
 import { chatService } from '../services/chatService.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // POST process chat message
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const { message, mode } = req.body;
+    const user = req.user; // Get authenticated user from middleware
 
     if (!message) {
       return res.status(400).json({
@@ -20,7 +22,7 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const response = await chatService.processMessage(message, mode);
+    const response = await chatService.processMessage(message, mode, user);
 
     res.json({
       success: true,
