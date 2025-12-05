@@ -11,6 +11,17 @@ import dashboardRouter from './routes/dashboard.js';
 import authRouter from './routes/auth.js';
 import adminUsersRouter from './routes/admin/users.js';
 import adminICRouter from './routes/admin/ic-composition.js';
+import copilotRouter from './routes/copilot.js';
+import documentsRouter from './routes/documents.js';
+import patternsRouter from './routes/patterns.js';
+import insightsRouter from './routes/insights.js';
+import orchestratorRouter from './routes/orchestrator.js';
+import evidenceRouter from './routes/evidence.js';
+import interviewsRouter from './routes/interviews.js';
+import externalMemberRouter from './routes/externalMember.js';
+import monitoringRouter from './routes/monitoring.js';
+import pushRouter from './routes/push.js';
+import { requestLogger } from './middleware/requestLogger.js';
 import { initializeDatabase } from './db/pg-init.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -27,6 +38,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(requestLogger);
 
 // API Routes (must come before static files)
 app.use('/api/auth', authRouter);
@@ -35,6 +47,16 @@ app.use('/api/chat', chatRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/admin/users', adminUsersRouter);
 app.use('/api/admin/ic-composition', adminICRouter);
+app.use('/api/copilot', copilotRouter);
+app.use('/api/orchestrator', orchestratorRouter);
+app.use('/api/documents', documentsRouter);
+app.use('/api/patterns', patternsRouter);
+app.use('/api/insights', insightsRouter);
+app.use('/api/evidence', evidenceRouter);
+app.use('/api/interviews', interviewsRouter);
+app.use('/api/external', externalMemberRouter);
+app.use('/api/monitoring', monitoringRouter);
+app.use('/api/push', pushRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

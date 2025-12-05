@@ -1,0 +1,51 @@
+{
+  "name": "ConductOS - PoSH Case Management",
+  "short_name": "ConductOS",
+  "description": "AI-powered PoSH compliance and case management platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F7",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Cases",
+      "short_name": "Cases",
+      "description": "View your assigned cases",
+      "url": "/cases"
+    },
+    {
+      "name": "IC Copilot",
+      "short_name": "Copilot",
+      "description": "Ask IC Copilot for guidance",
+      "url": "/copilot"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "evidence",
+          "accept": ["image/*", "application/pdf", ".doc", ".docx"]
+        }
+      ]
+    }
+  }
+}
