@@ -24,44 +24,44 @@ export default function AboutPoSH() {
 
   const faqs = [
     {
-      question: 'Can I file an anonymous complaint?',
+      question: "Can I file an anonymous complaint?",
       answer:
-        'You can request limited-disclosure anonymity where only the Presiding Officer knows your contact details. However, fully anonymous complaints may limit investigation. The IC needs some way to contact you for follow-up questions.',
+        "You can request limited-disclosure anonymity where only the Presiding Officer knows your contact details. However, fully anonymous complaints may limit investigation. The IC needs some way to contact you for follow-up questions.",
     },
     {
-      question: 'What if the harasser is my boss?',
+      question: "What if the harasser is my boss?",
       answer:
-        'The PoSH Act covers harassment by anyone — colleagues, supervisors, even clients. Having a senior position doesn't provide immunity. The IC will handle your complaint with extra care to prevent retaliation.',
+        "The PoSH Act covers harassment by anyone — colleagues, supervisors, even clients. Having a senior position doesn't provide immunity. The IC will handle your complaint with extra care to prevent retaliation.",
     },
     {
-      question: 'What if I don't have evidence?',
+      question: "What if I don't have evidence?",
       answer:
-        'Many harassment cases don't have direct evidence. Your testimony is evidence. The IC will evaluate all circumstances, patterns, and witness accounts. Don't let lack of "proof" stop you from reporting.',
+        "Many harassment cases don't have direct evidence. Your testimony is evidence. The IC will evaluate all circumstances, patterns, and witness accounts. Don't let lack of \"proof\" stop you from reporting.",
     },
     {
-      question: 'Can I be fired for filing a complaint?',
+      question: "Can I be fired for filing a complaint?",
       answer:
-        'No. Terminating or victimizing someone for filing a complaint is illegal under Section 14 of the Act. If this happens, it strengthens your case.',
+        "No. Terminating or victimizing someone for filing a complaint is illegal under Section 14 of the Act. If this happens, it strengthens your case.",
     },
     {
-      question: 'What if my complaint is found to be false?',
+      question: "What if my complaint is found to be false?",
       answer:
-        'The Act has provisions against malicious complaints. However, a complaint that cannot be proven is NOT the same as a false complaint. You won't be penalized simply because the IC couldn't establish the facts.',
+        "The Act has provisions against malicious complaints. However, a complaint that cannot be proven is NOT the same as a false complaint. You won't be penalized simply because the IC couldn't establish the facts.",
     },
     {
-      question: 'Can men file complaints under PoSH?',
+      question: "Can men file complaints under PoSH?",
       answer:
-        'The PoSH Act specifically covers women. However, most organizations have separate policies for harassment complaints by any gender. Check your company's policy or speak to HR.',
+        "The PoSH Act specifically covers women. However, most organizations have separate policies for harassment complaints by any gender. Check your company's policy or speak to HR.",
     },
     {
-      question: 'What happens to the harasser if found guilty?',
+      question: "What happens to the harasser if found guilty?",
       answer:
-        'The IC recommends action to the employer. This can range from written warning to termination, depending on severity. The IC may also recommend compensation to you.',
+        "The IC recommends action to the employer. This can range from written warning to termination, depending on severity. The IC may also recommend compensation to you.",
     },
     {
-      question: 'How long does the process take?',
+      question: "How long does the process take?",
       answer:
-        'The inquiry must be completed within 90 days by law. Most cases are resolved within this timeframe.',
+        "The inquiry must be completed within 90 days by law. Most cases are resolved within this timeframe.",
     },
   ];
 
@@ -239,51 +239,51 @@ export default function AboutPoSH() {
             {[
               {
                 number: 1,
-                title: 'Right to File a Complaint',
+                title: "Right to File a Complaint",
                 description:
-                  'You can file a written complaint with your Internal Committee within 3 months of the incident. This period can be extended by another 3 months if there were valid reasons for delay.',
+                  "You can file a written complaint with your Internal Committee within 3 months of the incident. This period can be extended by another 3 months if there were valid reasons for delay.",
               },
               {
                 number: 2,
-                title: 'Right to Conciliation',
+                title: "Right to Conciliation",
                 description:
-                  'Before formal inquiry, you can request conciliation — a mediated settlement. This is your choice. You cannot be pressured into it.',
+                  "Before formal inquiry, you can request conciliation — a mediated settlement. This is your choice. You cannot be pressured into it.",
               },
               {
                 number: 3,
-                title: 'Right to Confidentiality',
+                title: "Right to Confidentiality",
                 description:
-                  'Your identity must be protected. Section 16 prohibits disclosure of your name, address, identity, or any information that could identify you.',
+                  "Your identity must be protected. Section 16 prohibits disclosure of your name, address, identity, or any information that could identify you.",
               },
               {
                 number: 4,
-                title: 'Right to Fair Inquiry',
+                title: "Right to Fair Inquiry",
                 description:
-                  'The inquiry must follow principles of natural justice. You have the right to present evidence, call witnesses, and be heard fairly.',
+                  "The inquiry must follow principles of natural justice. You have the right to present evidence, call witnesses, and be heard fairly.",
               },
               {
                 number: 5,
-                title: 'Right to Interim Relief',
+                title: "Right to Interim Relief",
                 description:
-                  'During inquiry, you can request: Transfer (yours or the respondent's), Leave (up to 3 months paid leave), Restraining the respondent from contact.',
+                  "During inquiry, you can request: Transfer (yours or the respondent's), Leave (up to 3 months paid leave), Restraining the respondent from contact.",
               },
               {
                 number: 6,
-                title: 'Right to Protection from Retaliation',
+                title: "Right to Protection from Retaliation",
                 description:
-                  'You are protected from victimization. Any retaliation against you for filing a complaint is itself a violation.',
+                  "You are protected from victimization. Any retaliation against you for filing a complaint is itself a violation.",
               },
               {
                 number: 7,
-                title: 'Right to Time-Bound Resolution',
+                title: "Right to Time-Bound Resolution",
                 description:
-                  'The inquiry must be completed within 90 days. You have the right to a speedy resolution.',
+                  "The inquiry must be completed within 90 days. You have the right to a speedy resolution.",
               },
               {
                 number: 8,
-                title: 'Right to Appeal',
+                title: "Right to Appeal",
                 description:
-                  'If you're not satisfied with the IC's decision, you can appeal within 90 days.',
+                  "If you're not satisfied with the IC's decision, you can appeal within 90 days.",
               },
             ].map((right) => (
               <div
