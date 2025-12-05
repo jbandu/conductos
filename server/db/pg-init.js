@@ -207,6 +207,17 @@ export async function initializeDatabase() {
       )
     `);
 
+    // Ensure invitations schema aligns with index definitions when legacy tables exist
+    await client.query(`
+      ALTER TABLE invitations
+        ADD COLUMN IF NOT EXISTS token VARCHAR(255);
+    `);
+
+    await client.query(`
+      ALTER TABLE invitations
+        ALTER COLUMN token DROP NOT NULL;
+    `);
+
     // Create password reset tokens table
     await client.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -217,6 +228,17 @@ export async function initializeDatabase() {
         used_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
+    `);
+
+    // Align password reset schema for legacy deployments
+    await client.query(`
+      ALTER TABLE password_reset_tokens
+        ADD COLUMN IF NOT EXISTS token VARCHAR(255);
+    `);
+
+    await client.query(`
+      ALTER TABLE password_reset_tokens
+        ALTER COLUMN token DROP NOT NULL;
     `);
 
     // Create indexes for admin tables
