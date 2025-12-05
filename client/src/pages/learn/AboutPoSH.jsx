@@ -31,7 +31,7 @@ export default function AboutPoSH() {
     {
       question: "What if the harasser is my boss?",
       answer:
-        "The PoSH Act covers harassment by anyone — colleagues, supervisors, even clients. Having a senior position doesn't provide immunity. The IC will handle your complaint with extra care to prevent retaliation.",
+        "The PoSH Act covers harassment by anyone — colleagues, supervisors, even clients. Having a senior position doesn\'t provide immunity. The IC will handle your complaint with extra care to prevent retaliation.",
     },
     {
       question: "What if I don't have evidence?",
