@@ -14,13 +14,17 @@ function parseConnectionString(connString) {
 
   const dbUrl = new URL(connString);
 
+  // Enable SSL for production OR for Render databases (which always require SSL)
+  const isRenderDb = dbUrl.hostname.includes('render.com');
+  const requiresSsl = config.NODE_ENV === 'production' || isRenderDb;
+
   return {
     host: dbUrl.hostname,
     port: dbUrl.port,
     database: dbUrl.pathname.slice(1), // Remove leading '/'
     user: dbUrl.username,
     password: decodeURIComponent(dbUrl.password),
-    ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
+    ssl: requiresSsl ? { rejectUnauthorized: false } : undefined
   };
 }
 
