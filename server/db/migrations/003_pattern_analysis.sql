@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS case_characteristics (
   timeline_risk INTEGER,
   complexity_score INTEGER,
   retaliation_risk INTEGER,
-  embedding vector(1536),
+  embedding vector,
   key_phrases TEXT[],
   analyzed_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS case_patterns (
   recommended_approach TEXT,
   common_pitfalls TEXT[],
   confidence DECIMAL(3,2),
-  embedding vector(1536),
+  embedding vector,
   last_updated TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -48,6 +48,14 @@ CREATE TABLE IF NOT EXISTS case_similarities (
   UNIQUE(case_id, similar_pattern_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_case_chars_embedding ON case_characteristics USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN
+    CREATE INDEX IF NOT EXISTS idx_case_chars_embedding ON case_characteristics USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+  ELSE
+    RAISE NOTICE 'Skipping case_characteristics vector index: pgvector extension not installed.';
+  END IF;
+END
+$$;
 CREATE INDEX IF NOT EXISTS idx_case_chars_case ON case_characteristics(case_id);
 CREATE INDEX IF NOT EXISTS idx_patterns_type ON case_patterns(pattern_type);
