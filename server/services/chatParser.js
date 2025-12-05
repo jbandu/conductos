@@ -24,7 +24,8 @@ const INTENT_PATTERNS = {
     /view\s+(all\s+)?cases/i,
     /my\s+cases/i,
     /all\s+cases/i,
-    /display\s+cases/i
+    /display\s+cases/i,
+    /check\s+my\s+case\s+status/i
   ],
 
   CASE_PENDING: [
@@ -150,6 +151,11 @@ export function parseCommand(message, mode = 'employee') {
     // Complaint filing
     if (matchesPattern(trimmedMessage, INTENT_PATTERNS.COMPLAINT_START)) {
       return { intent: 'COMPLAINT_START', params: {} };
+    }
+
+    // Case list (employee view limited to own cases)
+    if (matchesPattern(trimmedMessage, INTENT_PATTERNS.CASE_LIST)) {
+      return { intent: 'CASE_LIST', params: {} };
     }
 
     // Case status lookup (only for own cases)
