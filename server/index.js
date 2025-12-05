@@ -23,6 +23,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = config.PORT;
 
+// Trust proxy - required for Render and other reverse proxy setups
+// This allows rate limiting and other middleware to correctly identify client IPs
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors({
   origin: config.NODE_ENV === 'production'
