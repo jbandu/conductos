@@ -72,7 +72,7 @@ test.describe('90-Day Deadline - Critical Legal Compliance @critical', () => {
       expect(responseBody.error || responseBody.message).toMatch(/future|invalid|cannot/i);
     });
 
-    test('MUST allow today's date (boundary case)', async ({ page }) => {
+    test('MUST allow today\'s date (boundary case)', async ({ page }) => {
       // Boundary: Today is valid
 
       await page.goto('/');
