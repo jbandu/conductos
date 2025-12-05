@@ -37,23 +37,6 @@ test.describe('Admin Features', () => {
         await expect(page.locator(`main h1:has-text("${expected}")`)).toBeVisible();
       }
     });
-
-    test('sidebar links should navigate to correct admin pages', async ({ page }) => {
-      const navigationChecks = [
-        { link: 'a[href="/admin/dashboard"]', expected: 'Admin Dashboard' },
-        { link: 'a[href="/admin/users"]', expected: 'User Management' },
-        { link: 'a[href="/admin/ic-composition"]', expected: 'IC Composition' },
-        { link: 'a[href="/admin/organization"]', expected: 'Organization Settings' },
-        { link: 'a[href="/admin/audit-log"]', expected: 'Audit Log' },
-        { link: 'a[href="/admin/external-members"]', expected: 'External IC Members' },
-        { link: 'a[href="/admin/monitoring"]', expected: 'System Monitoring' }
-      ];
-
-      for (const { link, expected } of navigationChecks) {
-        await page.click(link);
-        await expect(page.locator(`text=${expected}`)).toBeVisible();
-      }
-    });
   });
 
   test.describe('Audit Log Viewer', () => {

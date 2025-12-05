@@ -459,5 +459,5 @@ export async function loginAs(page, role = 'employee') {
     await page.waitForURL('**/chat');
   }
 
-  await expect(page.locator('text=ConductOS')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /ConductOS/ })).toBeVisible();
 }
