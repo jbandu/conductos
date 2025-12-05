@@ -34,6 +34,7 @@ export default function Sidebar() {
 
   const handleNewChat = () => {
     clearMessages();
+    navigate('/chat');
     setSidebarOpen(false);
   };
 
@@ -41,15 +42,20 @@ export default function Sidebar() {
     const newMode = currentMode === 'employee' ? 'ic' : 'employee';
     setCurrentMode(newMode);
     clearMessages();
+    navigate('/chat');
   };
 
   const handleCaseClick = async (caseCode) => {
     setSidebarOpen(false);
-    // Trigger case detail view by adding a message
-    // This will be picked up by ChatLayout
-    if (window.dispatchEvent) {
-      window.dispatchEvent(new CustomEvent('viewCase', { detail: { caseCode } }));
-    }
+    setCurrentMode('ic');
+    navigate('/chat');
+
+    // Allow navigation to complete before requesting the case view in ChatLayout
+    requestAnimationFrame(() => {
+      if (window.dispatchEvent) {
+        window.dispatchEvent(new CustomEvent('viewCase', { detail: { caseCode } }));
+      }
+    });
   };
 
   const handleLogout = () => {

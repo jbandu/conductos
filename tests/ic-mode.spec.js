@@ -1,14 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { loginAs } from './helpers/apiMocks';
 
 test.describe('IC Mode', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-
-    // Switch to IC mode
-    const icModeButton = page.locator('button:has-text("IC Mode")');
-    if (await icModeButton.isVisible()) {
-      await icModeButton.click();
-    }
+    await loginAs(page, 'ic');
   });
 
   test('should display IC dashboard header', async ({ page }) => {
@@ -42,7 +37,7 @@ test.describe('IC Mode', () => {
     await page.waitForTimeout(2000);
 
     // Should see case cards or a message
-    const hasCaseCards = await page.locator('.border.border-gray-200.rounded-lg.p-4').count() > 0;
+    const hasCaseCards = await page.locator('.border.border-warm-200.rounded-lg.p-4').count() > 0;
     const hasNoCasesMessage = await page.locator('text=No cases found').isVisible().catch(() => false);
 
     expect(hasCaseCards || hasNoCasesMessage).toBeTruthy();
@@ -89,7 +84,7 @@ test.describe('IC Mode', () => {
   });
 
   test('should display IC mode badge', async ({ page }) => {
-    const badge = page.locator('.bg-purple-100.text-purple-700:has-text("IC Mode")');
+    const badge = page.locator('.bg-accent-500\\/10.text-accent-600:has-text("IC Mode")');
     await expect(badge).toBeVisible();
   });
 
@@ -101,14 +96,14 @@ test.describe('IC Mode', () => {
     await page.waitForTimeout(2000);
 
     // Check if at least one case card exists
-    const caseCards = page.locator('.border.border-gray-200.rounded-lg.p-4');
+    const caseCards = page.locator('.border.border-warm-200.rounded-lg.p-4');
     const count = await caseCards.count();
 
     if (count > 0) {
       const firstCard = caseCards.first();
 
       // Should have case code
-      await expect(firstCard.locator('.font-semibold.text-gray-900.text-lg')).toBeVisible();
+      await expect(firstCard.locator('.font-semibold.text-warm-900.text-lg')).toBeVisible();
 
       // Should have status badge
       await expect(firstCard.locator('.px-3.py-1.rounded-full')).toBeVisible();
@@ -122,7 +117,7 @@ test.describe('IC Mode', () => {
     // Wait for cases to load
     await page.waitForTimeout(2000);
 
-    const caseCards = page.locator('.border.border-gray-200.rounded-lg.p-4');
+    const caseCards = page.locator('.border.border-warm-200.rounded-lg.p-4');
     const count = await caseCards.count();
 
     if (count > 0) {
@@ -155,13 +150,13 @@ test.describe('IC Mode', () => {
     // Wait for cases to load
     await page.waitForTimeout(2000);
 
-    const caseCards = page.locator('.cursor-pointer.border.border-gray-200.rounded-lg');
+    const caseCards = page.locator('.cursor-pointer.border.border-warm-200.rounded-lg');
     const count = await caseCards.count();
 
     if (count > 0) {
       // Card should have hover effect classes
       const firstCard = caseCards.first();
-      await expect(firstCard).toHaveClass(/hover:border-gray-300/);
+      await expect(firstCard).toHaveClass(/hover:border-warm-300/);
       await expect(firstCard).toHaveClass(/cursor-pointer/);
     }
   });
@@ -186,7 +181,7 @@ test.describe('IC Mode', () => {
     await page.waitForTimeout(1000);
 
     // IC Mode badge should still be visible
-    await expect(page.locator('.bg-purple-100.text-purple-700:has-text("IC Mode")')).toBeVisible();
+    await expect(page.locator('.bg-accent-500\\/10.text-accent-600:has-text("IC Mode")')).toBeVisible();
   });
 
   test('should have accessible search input', async ({ page }) => {

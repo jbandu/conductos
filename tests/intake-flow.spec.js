@@ -1,34 +1,22 @@
 import { test, expect } from '@playwright/test';
+import { loginAs } from './helpers/apiMocks';
 
 test.describe('Intake Flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-
-    // Ensure we're in employee mode
-    const employeeModeButton = page.locator('button:has-text("Employee Mode")');
-    if (await employeeModeButton.isVisible()) {
-      await employeeModeButton.click();
-    }
+    await loginAs(page, 'employee');
   });
 
   test('should start intake flow when "I want to report harassment" clicked', async ({ page }) => {
     const chip = page.locator('button:has-text("I want to report harassment")');
     await chip.click();
 
-    // Wait for intake flow to start
-    await page.waitForTimeout(2000);
-
-    // Should see pre-intake message or intake UI
-    const hasIntakeFlow = await page.locator('text=/help you file a complaint|confidential/i').isVisible({ timeout: 5000 });
-    expect(hasIntakeFlow).toBeTruthy();
+    await expect(page.locator('text=/help you file a complaint|confidential/i')).toBeVisible({ timeout: 2000 });
   });
 
   test('should display pre-intake consent message', async ({ page }) => {
     // Trigger intake flow via API or UI
     const chip = page.locator('button:has-text("I want to report harassment")');
     await chip.click();
-
-    await page.waitForTimeout(2000);
 
     // Check for pre-intake message
     const consentText = page.locator('text=/confidential.*PoSH Act/i');
@@ -39,8 +27,6 @@ test.describe('Intake Flow', () => {
     const chip = page.locator('button:has-text("I want to report harassment")');
     await chip.click();
 
-    await page.waitForTimeout(2000);
-
     // Look for Continue button
     const continueButton = page.locator('button:has-text("Continue")');
     await expect(continueButton).toBeVisible({ timeout: 5000 });
@@ -49,8 +35,6 @@ test.describe('Intake Flow', () => {
   test('should progress to incident date after Continue', async ({ page }) => {
     const chip = page.locator('button:has-text("I want to report harassment")');
     await chip.click();
-
-    await page.waitForTimeout(2000);
 
     const continueButton = page.locator('button:has-text("Continue")');
     if (await continueButton.isVisible({ timeout: 5000 })) {
@@ -64,8 +48,6 @@ test.describe('Intake Flow', () => {
   test('should show date picker for incident date', async ({ page }) => {
     const chip = page.locator('button:has-text("I want to report harassment")');
     await chip.click();
-
-    await page.waitForTimeout(2000);
 
     // Click continue to reach incident date step
     const continueButton = page.locator('button:has-text("Continue")');
