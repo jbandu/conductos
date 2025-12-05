@@ -12,9 +12,20 @@
     "dev:client": "npm run dev --workspace=client",
     "dev:server": "npm run dev --workspace=server",
     "build": "npm run build --workspace=client",
-    "start": "npm start --workspace=server"
+    "start": "npm start --workspace=server",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:employee": "playwright test tests/employee-mode.spec.js",
+    "test:ic": "playwright test tests/ic-mode.spec.js",
+    "test:intake": "playwright test tests/intake-flow.spec.js",
+    "test:cases": "playwright test tests/case-management.spec.js",
+    "test:mobile": "playwright test tests/mobile.spec.js --project='Mobile Chrome'",
+    "test:report": "playwright show-report"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "concurrently": "^8.2.2"
   }
 }

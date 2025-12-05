@@ -31,10 +31,15 @@ function CaseCard({ caseData, onCaseClick }) {
   const isOverdue = caseData.is_overdue;
   const daysRemaining = caseData.days_remaining;
 
+  const handleClick = () => {
+    console.log('Case card clicked:', caseData.case_code);
+    onCaseClick(caseData.case_code);
+  };
+
   return (
-    <div 
+    <div
       className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer bg-white"
-      onClick={() => onCaseClick(caseData.case_code)}
+      onClick={handleClick}
     >
       {/* Header: Case Code + Status */}
       <div className="flex items-start justify-between mb-3">

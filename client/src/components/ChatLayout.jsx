@@ -36,6 +36,17 @@ export default function ChatLayout() {
     scrollToBottom();
   }, [messages, isTyping, showIntakeFlow]);
 
+  useEffect(() => {
+    const handleViewCase = (event) => {
+      const { caseCode } = event.detail;
+      addMessage('user', `status ${caseCode}`);
+      processMessage(`status ${caseCode}`);
+    };
+
+    window.addEventListener('viewCase', handleViewCase);
+    return () => window.removeEventListener('viewCase', handleViewCase);
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -54,6 +65,7 @@ export default function ChatLayout() {
 
       if (result.success && result.response) {
         const { type, content } = result.response;
+        console.log('API Response:', { type, content });
 
         // Handle different response types
         if (type === 'intake_start') {
@@ -61,6 +73,7 @@ export default function ChatLayout() {
           addMessage('system', content.message);
         } else if (type === 'case_list' || type === 'case_detail' || type === 'case_update_success') {
           // Store full response data for rich components
+          console.log('Adding rich message:', { type, ...content });
           addMessage('system', { type, ...content });
         } else if (type === 'text') {
           addMessage('system', content);

@@ -32,6 +32,15 @@ export default function Sidebar() {
     clearMessages();
   };
 
+  const handleCaseClick = async (caseCode) => {
+    setSidebarOpen(false);
+    // Trigger case detail view by adding a message
+    // This will be picked up by ChatLayout
+    if (window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('viewCase', { detail: { caseCode } }));
+    }
+  };
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -105,6 +114,7 @@ export default function Sidebar() {
                   {recentCases.map((caseItem) => (
                     <button
                       key={caseItem.id}
+                      onClick={() => handleCaseClick(caseItem.case_code)}
                       className="w-full text-left px-3 py-2 hover:bg-gray-800 rounded text-sm transition-colors min-h-[44px]"
                     >
                       <p className="font-medium truncate">{caseItem.case_code}</p>
@@ -113,6 +123,20 @@ export default function Sidebar() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Employee Mode Help */}
+        {currentMode === 'employee' && (
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4">
+              <h3 className="text-sm font-semibold text-gray-400 mb-2">Quick Actions</h3>
+              <div className="space-y-2 text-sm text-gray-500">
+                <p>• Report an incident</p>
+                <p>• Check case status</p>
+                <p>• Learn about PoSH</p>
+              </div>
             </div>
           </div>
         )}
