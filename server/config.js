@@ -21,5 +21,7 @@ export const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5174',
   JWT_SECRET: process.env.JWT_SECRET || 'default-secret-change-in-production',
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d'
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@conductos.app'
 };

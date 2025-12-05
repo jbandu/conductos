@@ -1,5 +1,6 @@
 import pool from '../db/pg-init.js';
 import { generateCaseCode } from '../db/utils.js';
+import { sendCaseStatusUpdateEmail } from './emailService.js';
 
 export const caseService = {
   /**
@@ -242,6 +243,27 @@ export const caseService = {
       );
 
       await client.query('COMMIT');
+
+      // Get user email and name for notification
+      const userResult = await client.query(
+        'SELECT email, full_name FROM users WHERE id = $1',
+        [currentCase.complainant_id]
+      );
+
+      if (userResult.rows.length > 0) {
+        const user = userResult.rows[0];
+        // Send email notification asynchronously (don't block)
+        sendCaseStatusUpdateEmail(
+          user.email,
+          user.full_name,
+          currentCase.id,
+          currentCase.status,
+          status
+        ).catch(err => {
+          console.error('Failed to send case status update email:', err);
+        });
+      }
+
       return this.getCaseByCode(caseCode);
     } catch (error) {
       await client.query('ROLLBACK');

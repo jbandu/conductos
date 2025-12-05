@@ -11,9 +11,14 @@ import EmployeeLogin from './pages/auth/EmployeeLogin';
 import EmployeeSignup from './pages/auth/EmployeeSignup';
 import ICLogin from './pages/auth/ICLogin';
 import AdminLogin from './pages/auth/AdminLogin';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import ICComposition from './pages/admin/ICComposition';
+import AuditLog from './pages/admin/AuditLog';
+import OrganizationSettings from './pages/admin/OrganizationSettings';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -32,11 +37,18 @@ function App() {
           <Route path="/login/ic" element={<ICLogin />} />
           <Route path="/login/admin" element={<AdminLogin />} />
           <Route path="/signup/employee" element={<EmployeeSignup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Application */}
           <Route path="/chat" element={
             <ProtectedRoute>
               <ChatPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           } />
 
@@ -54,6 +66,16 @@ function App() {
           <Route path="/admin/ic-composition" element={
             <ProtectedRoute requiredRole="hr_admin">
               <ICComposition />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/audit-log" element={
+            <ProtectedRoute requiredRole="hr_admin">
+              <AuditLog />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/organization" element={
+            <ProtectedRoute requiredRole="hr_admin">
+              <OrganizationSettings />
             </ProtectedRoute>
           } />
         </Routes>
