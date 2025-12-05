@@ -86,7 +86,14 @@ export const caseService = {
    * Get all cases with optional filters
    */
   async getAllCases(filters = {}) {
-    let query = 'SELECT * FROM cases WHERE 1=1';
+    // Use SQL date functions to calculate days_remaining and is_overdue
+    let query = `
+      SELECT *,
+        (deadline_date - CURRENT_DATE) as days_remaining,
+        (deadline_date < CURRENT_DATE) as is_overdue
+      FROM cases
+      WHERE 1=1
+    `;
     const params = [];
     let paramIndex = 1;
 
@@ -97,12 +104,9 @@ export const caseService = {
       paramIndex++;
     }
 
-    // Filter by overdue
+    // Filter by overdue - use SQL date comparison
     if (filters.is_overdue === 'true') {
-      const today = new Date().toISOString().split('T')[0];
-      query += ` AND deadline_date < $${paramIndex}`;
-      params.push(today);
-      paramIndex++;
+      query += ` AND deadline_date < CURRENT_DATE`;
     }
 
     // Search in case_code or description
@@ -115,23 +119,35 @@ export const caseService = {
     query += ' ORDER BY created_at DESC';
 
     const result = await pool.query(query, params);
-    return result.rows.map(c => this.enrichCase(c));
+    return result.rows;
   },
 
   /**
    * Get a single case by ID
    */
   async getCaseById(id) {
-    const result = await pool.query('SELECT * FROM cases WHERE id = $1', [id]);
-    return this.enrichCase(result.rows[0]);
+    const result = await pool.query(`
+      SELECT *,
+        (deadline_date - CURRENT_DATE) as days_remaining,
+        (deadline_date < CURRENT_DATE) as is_overdue
+      FROM cases
+      WHERE id = $1
+    `, [id]);
+    return result.rows[0];
   },
 
   /**
    * Get a single case by case code
    */
   async getCaseByCode(caseCode) {
-    const result = await pool.query('SELECT * FROM cases WHERE case_code = $1', [caseCode]);
-    return this.enrichCase(result.rows[0]);
+    const result = await pool.query(`
+      SELECT *,
+        (deadline_date - CURRENT_DATE) as days_remaining,
+        (deadline_date < CURRENT_DATE) as is_overdue
+      FROM cases
+      WHERE case_code = $1
+    `, [caseCode]);
+    return result.rows[0];
   },
 
   /**
@@ -171,16 +187,28 @@ export const caseService = {
       deadlineDate
     ];
 
-    const result = await pool.query(query, values);
-    const caseId = result.rows[0].id;
+    // Use transaction for multi-step write
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    // Record initial status in history
-    await pool.query(
-      'INSERT INTO status_history (case_id, new_status, notes) VALUES ($1, $2, $3)',
-      [caseId, 'new', 'Case created']
-    );
+      const result = await client.query(query, values);
+      const caseId = result.rows[0].id;
 
-    return this.getCaseById(caseId);
+      // Record initial status in history
+      await client.query(
+        'INSERT INTO status_history (case_id, new_status, notes) VALUES ($1, $2, $3)',
+        [caseId, 'new', 'Case created']
+      );
+
+      await client.query('COMMIT');
+      return this.getCaseById(caseId);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
   /**
@@ -197,18 +225,30 @@ export const caseService = {
       throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
     }
 
-    await pool.query(
-      'UPDATE cases SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE case_code = $2',
-      [status, caseCode]
-    );
+    // Use transaction for multi-step write
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    // Record status change
-    await pool.query(
-      'INSERT INTO status_history (case_id, old_status, new_status, notes) VALUES ($1, $2, $3, $4)',
-      [currentCase.id, currentCase.status, status, notes]
-    );
+      await client.query(
+        'UPDATE cases SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE case_code = $2',
+        [status, caseCode]
+      );
 
-    return this.getCaseByCode(caseCode);
+      // Record status change
+      await client.query(
+        'INSERT INTO status_history (case_id, old_status, new_status, notes) VALUES ($1, $2, $3, $4)',
+        [currentCase.id, currentCase.status, status, notes]
+      );
+
+      await client.query('COMMIT');
+      return this.getCaseByCode(caseCode);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
   /**

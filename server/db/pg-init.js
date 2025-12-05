@@ -27,8 +27,6 @@ function parseConnectionString(connString) {
 // Get or create connection pool
 function getPool() {
   if (!pool) {
-    console.log('Creating PostgreSQL connection pool...');
-    console.log('DATABASE_URL:', config.DATABASE_URL ? 'Set' : 'NOT SET');
     pool = new Pool(parseConnectionString(config.DATABASE_URL));
   }
   return pool;

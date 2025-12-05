@@ -9,12 +9,14 @@ export function AuthProvider({ children }) {
   // Check for existing session on mount
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (error) {
         console.error('Failed to parse stored user:', error);
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
       }
     }
     setIsLoading(false);
@@ -22,7 +24,6 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password, role) => {
     try {
-      // TODO: Replace with actual API call
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -30,14 +31,16 @@ export function AuthProvider({ children }) {
       });
 
       if (!response.ok) {
-        throw new Error('Login failed');
+        const error = await response.json();
+        throw new Error(error.error || 'Login failed');
       }
 
-      const userData = await response.json();
+      const { token, user: userData } = await response.json();
 
-      // Store user data
+      // Store user data and token
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', token);
 
       return { success: true };
     } catch (error) {
@@ -48,7 +51,6 @@ export function AuthProvider({ children }) {
 
   const signup = async (fullName, email, password, role) => {
     try {
-      // TODO: Replace with actual API call
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,14 +58,16 @@ export function AuthProvider({ children }) {
       });
 
       if (!response.ok) {
-        throw new Error('Signup failed');
+        const error = await response.json();
+        throw new Error(error.error || 'Signup failed');
       }
 
-      const userData = await response.json();
+      const { token, user: userData } = await response.json();
 
-      // Store user data
+      // Store user data and token
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', token);
 
       return { success: true };
     } catch (error) {
@@ -75,6 +79,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   const hasRole = (role) => {

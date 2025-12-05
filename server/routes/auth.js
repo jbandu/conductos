@@ -1,12 +1,39 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import db from '../db/pg-init.js';
+import { config } from '../config.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 const SALT_ROUNDS = 10;
 
+// Rate limiting for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 requests per window
+  message: 'Too many authentication attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Helper function to generate JWT token
+function generateToken(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      is_super_admin: user.is_super_admin
+    },
+    config.JWT_SECRET,
+    { expiresIn: config.JWT_EXPIRES_IN }
+  );
+}
+
 // Login endpoint
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
@@ -17,7 +44,7 @@ router.post('/login', async (req, res) => {
 
     // Find user by email
     const result = await db.query(
-      'SELECT * FROM users WHERE email = $1',
+      'SELECT * FROM users WHERE email = $1 AND is_active = true',
       [email.toLowerCase()]
     );
 
@@ -45,12 +72,19 @@ router.post('/login', async (req, res) => {
       [user.id]
     );
 
-    // Return user data (without password hash)
+    // Generate JWT token
+    const token = generateToken(user);
+
+    // Return user data with token
     res.json({
-      id: user.id,
-      fullName: user.full_name,
-      email: user.email,
-      role: user.role
+      token,
+      user: {
+        id: user.id,
+        fullName: user.full_name,
+        email: user.email,
+        role: user.role,
+        is_super_admin: user.is_super_admin
+      }
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -59,7 +93,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Signup endpoint
-router.post('/signup', async (req, res) => {
+router.post('/signup', authLimiter, async (req, res) => {
   try {
     const { fullName, email, password, role } = req.body;
 
@@ -87,20 +121,27 @@ router.post('/signup', async (req, res) => {
 
     // Create user
     const result = await db.query(
-      `INSERT INTO users (full_name, email, password_hash, role)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, full_name, email, role`,
+      `INSERT INTO users (full_name, email, password_hash, role, is_active)
+       VALUES ($1, $2, $3, $4, true)
+       RETURNING id, full_name, email, role, is_super_admin`,
       [fullName, email.toLowerCase(), passwordHash, role]
     );
 
     const user = result.rows[0];
 
-    // Return user data
+    // Generate JWT token
+    const token = generateToken(user);
+
+    // Return user data with token
     res.status(201).json({
-      id: user.id,
-      fullName: user.full_name,
-      email: user.email,
-      role: user.role
+      token,
+      user: {
+        id: user.id,
+        fullName: user.full_name,
+        email: user.email,
+        role: user.role,
+        is_super_admin: user.is_super_admin
+      }
     });
   } catch (error) {
     console.error('Signup error:', error);
@@ -109,10 +150,31 @@ router.post('/signup', async (req, res) => {
 });
 
 // Get current user (for session validation)
-router.get('/me', async (req, res) => {
-  // TODO: Implement proper session/token validation
-  // For now, this endpoint is a placeholder
-  res.status(501).json({ error: 'Not implemented' });
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    // Get fresh user data from database
+    const result = await db.query(
+      'SELECT id, full_name, email, role, is_super_admin, is_active FROM users WHERE id = $1',
+      [req.user.id]
+    );
+
+    if (result.rows.length === 0 || !result.rows[0].is_active) {
+      return res.status(401).json({ error: 'User not found or inactive' });
+    }
+
+    const user = result.rows[0];
+
+    res.json({
+      id: user.id,
+      fullName: user.full_name,
+      email: user.email,
+      role: user.role,
+      is_super_admin: user.is_super_admin
+    });
+  } catch (error) {
+    console.error('Get current user error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 export default router;

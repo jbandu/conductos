@@ -62,12 +62,12 @@ router.get('/stats', async (req, res) => {
     const overdue = activeCases.filter(c => c.is_overdue).length;
     const dueToday = activeCases.filter(c => c.days_remaining === 0).length;
 
-    // New cases in last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    // New cases in last 7 days - use SQL date comparison to avoid timezone issues
     const newCases = allCases.filter(c => {
-      const reportedDate = new Date(c.reported_at);
-      return reportedDate >= sevenDaysAgo;
+      // Compare dates using SQL: created_at >= CURRENT_DATE - INTERVAL '7 days'
+      // Since we already have the cases, we check if created_at is within 7 days
+      const daysSinceCreation = (Date.now() - new Date(c.created_at)) / (1000 * 60 * 60 * 24);
+      return daysSinceCreation <= 7;
     }).length;
 
     // In progress cases (not new, not closed)
