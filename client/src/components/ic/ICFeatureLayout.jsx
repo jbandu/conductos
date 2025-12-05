@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChatProvider, useChat } from '../../contexts/ChatContext';
+import { useChat } from '../../contexts/ChatContext';
 import Sidebar from '../Sidebar';
 
 function ICFeatureShell({ title, description, children }) {
@@ -45,9 +45,5 @@ function ICFeatureShell({ title, description, children }) {
 }
 
 export default function ICFeatureLayout(props) {
-  return (
-    <ChatProvider>
-      <ICFeatureShell {...props} />
-    </ChatProvider>
-  );
+  return <ICFeatureShell {...props} />;
 }

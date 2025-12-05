@@ -25,7 +25,17 @@ const IC_CHIPS = [
 ];
 
 export default function ChatLayout() {
-  const { messages, currentMode, isTyping, sidebarOpen, setSidebarOpen, addMessage, setIsTyping } = useChat();
+  const {
+    messages,
+    currentMode,
+    isTyping,
+    sidebarOpen,
+    setSidebarOpen,
+    addMessage,
+    setIsTyping,
+    pendingCaseCode,
+    setPendingCaseCode
+  } = useChat();
   const [inputValue, setInputValue] = useState('');
   const [showIntakeFlow, setShowIntakeFlow] = useState(false);
   const messagesEndRef = useRef(null);
@@ -38,15 +48,12 @@ export default function ChatLayout() {
   }, [messages, isTyping, showIntakeFlow]);
 
   useEffect(() => {
-    const handleViewCase = (event) => {
-      const { caseCode } = event.detail;
-      addMessage('user', `status ${caseCode}`);
-      processMessage(`status ${caseCode}`);
-    };
-
-    window.addEventListener('viewCase', handleViewCase);
-    return () => window.removeEventListener('viewCase', handleViewCase);
-  }, []);
+    if (pendingCaseCode) {
+      addMessage('user', `status ${pendingCaseCode}`);
+      processMessage(`status ${pendingCaseCode}`);
+      setPendingCaseCode(null);
+    }
+  }, [pendingCaseCode]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

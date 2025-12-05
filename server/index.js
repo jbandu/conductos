@@ -125,14 +125,27 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize database and start server
-initializeDatabase()
-  .then(() => {
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server is running on port ${PORT}`);
+const startServer = (port, retries = 2) => {
+  const server = app
+    .listen(port, '0.0.0.0', () => {
+      console.log(`Server is running on port ${port}`);
       console.log(`API endpoints available at /api`);
       console.log(`Environment: ${config.NODE_ENV}`);
+    })
+    .on('error', (error) => {
+      if (error.code === 'EADDRINUSE' && retries > 0) {
+        const nextPort = port + 1;
+        console.warn(`Port ${port} is in use, retrying on ${nextPort}...`);
+        server.close(() => startServer(nextPort, retries - 1));
+      } else {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+      }
     });
-  })
+};
+
+initializeDatabase()
+  .then(() => startServer(PORT))
   .catch((error) => {
     console.error('Failed to initialize database:', error);
     process.exit(1);
