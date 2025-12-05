@@ -21,13 +21,13 @@ export default function Hero() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link
-                to="/chat"
+                to="/login"
                 className="px-8 py-4 bg-accent-600 hover:bg-accent-700 text-white rounded-lg font-semibold transition-all hover:scale-105 shadow-lg text-center"
               >
                 Report an Incident
               </Link>
               <Link
-                to="/chat"
+                to="/login"
                 className="px-8 py-4 border-2 border-primary-500 text-primary-600 hover:bg-primary-50 rounded-lg font-semibold transition-all text-center"
               >
                 Check Case Status
