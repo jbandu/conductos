@@ -4,7 +4,7 @@ test.describe('Profile Management', () => {
   test.beforeEach(async ({ page }) => {
     // Login as employee
     await page.goto('/login/employee');
-    await page.fill('input[type="email"]', 'employee@example.com');
+    await page.fill('input[type="email"]', 'employee@test.com');
     await page.fill('input[type="password"]', 'password123');
     await page.click('button[type="submit"]');
     await page.waitForURL('/chat');

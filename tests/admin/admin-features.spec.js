@@ -4,8 +4,8 @@ test.describe('Admin Features', () => {
   test.beforeEach(async ({ page }) => {
     // Login as admin
     await page.goto('/login/admin');
-    await page.fill('input[type="email"]', 'admin@example.com');
-    await page.fill('input[type="password"]', 'admin123');
+    await page.fill('input[type="email"]', 'admin@demo.kelphr.com');
+    await page.fill('input[type="password"]', 'Admin@123456');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
   });

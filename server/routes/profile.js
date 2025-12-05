@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
         u.is_active,
         u.organization_id,
         u.created_at,
-        u.last_login_at,
+        u.last_login,
         o.name as organization_name
       FROM users u
       LEFT JOIN organizations o ON u.organization_id = o.id
@@ -58,9 +58,9 @@ router.patch('/', async (req, res) => {
 
     const result = await pool.query(`
       UPDATE users
-      SET full_name = $1, updated_at = NOW()
+      SET full_name = $1
       WHERE id = $2
-      RETURNING id, full_name, email, role, is_super_admin, updated_at
+      RETURNING id, full_name, email, role, is_super_admin
     `, [full_name.trim(), req.user.id]);
 
     if (result.rows.length === 0) {
@@ -125,7 +125,7 @@ router.post('/change-password', async (req, res) => {
     // Update password
     await pool.query(`
       UPDATE users
-      SET password_hash = $1, updated_at = NOW()
+      SET password_hash = $1
       WHERE id = $2
     `, [newPasswordHash, req.user.id]);
 

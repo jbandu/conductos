@@ -37,21 +37,25 @@ npm run frontend
 
 ## Test Accounts
 
-After running `npm run seed:demo`, you'll have:
+After running `npm run seed:admin`, you'll have:
 
 ### Admin Account
-- Email: `admin@acme.com`
-- Password: `admin123`
+- Email: `admin@demo.kelphr.com`
+- Password: `Admin@123456`
 - Access: Full admin panel, user management, audit log
 
-### Employee Account
-- Email: `employee@acme.com`
-- Password: `employee123`
+### Employee Accounts
+- Email: `employee@test.com`
+- Password: `password123`
 - Access: Report cases, view own cases
 
-### IC Member Account
-- Email: `ic.member@acme.com`
-- Password: `ic123`
+### IC Member Accounts
+- Email: `priya.sharma@demo.kelphr.com`
+- Password: `password123`
+- Access: View all cases, update case status (Presiding Officer)
+
+- Email: `ic@test.com`
+- Password: `password123`
 - Access: View all cases, update case status
 
 ## New Features to Test
