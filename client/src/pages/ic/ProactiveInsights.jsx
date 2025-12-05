@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import ICFeatureLayout from '../../components/ic/ICFeatureLayout';
 
 export default function ProactiveInsights() {
   const [insights, setInsights] = useState([]);
@@ -10,11 +11,19 @@ export default function ProactiveInsights() {
     fetchInsights();
   }, []);
 
+  const normalizeInsight = (insight = {}) => ({
+    ...insight,
+    status: insight?.status || 'unknown',
+    category: insight?.category || 'case_management',
+    priority: insight?.priority || 'low',
+    recommendation: insight?.recommendation || insight?.recommended_action || insight?.recommendations?.join(', ')
+  });
+
   const fetchInsights = async () => {
     try {
       setLoading(true);
       const data = await api.getInsights();
-      setInsights(data);
+      setInsights((data || []).map(normalizeInsight));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -51,6 +60,11 @@ export default function ProactiveInsights() {
     return colors[status] || 'bg-gray-100 text-gray-700';
   };
 
+  const formatLabel = (value, fallback = '') => {
+    const label = value ?? fallback;
+    return typeof label === 'string' ? label.replace('_', ' ') : String(label);
+  };
+
   const getCategoryIcon = (category) => {
     const icons = {
       'compliance': (
@@ -72,102 +86,98 @@ export default function ProactiveInsights() {
     return icons[category] || icons['case_management'];
   };
 
-  if (loading) {
-    return (
-      <div className="p-6">
+  return (
+    <ICFeatureLayout
+      title="Proactive Insights"
+      description="AI-generated recommendations and compliance alerts"
+    >
+      {loading && (
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/4"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
         </div>
-      </div>
-    );
-  }
+      )}
 
-  return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Proactive Insights</h1>
-        <p className="text-gray-600">AI-generated recommendations and compliance alerts</p>
-      </div>
-
-      {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      {!loading && error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
 
-      <div className="grid gap-6">
-        {insights.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            <p className="mt-2 text-gray-600">No insights available yet</p>
-          </div>
-        ) : (
-          insights.map((insight) => (
-            <div key={insight.id} className={`border-2 rounded-lg p-6 ${getPriorityColor(insight.priority)}`}>
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 text-gray-700">
-                  {getCategoryIcon(insight.category)}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">{insight.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
-                      {insight.status.replace('_', ' ')}
-                    </span>
+      {!loading && (
+        <div className="grid gap-6">
+          {insights.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              <p className="mt-2 text-gray-600">No insights available yet</p>
+            </div>
+          ) : (
+            insights.map((insight) => (
+              <div key={insight.id} className={`border-2 rounded-lg p-6 ${getPriorityColor(insight.priority)}`}>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 text-gray-700">
+                    {getCategoryIcon(insight.category)}
                   </div>
-                  <p className="text-gray-700 mb-4">{insight.description}</p>
-
-                  {insight.recommendation && (
-                    <div className="mb-4 p-4 bg-white bg-opacity-50 rounded">
-                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Recommended Action:</h4>
-                      <p className="text-gray-700">{insight.recommendation}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-semibold text-gray-900">{insight.title}</h3>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
+                          {formatLabel(insight.status, 'unknown')}
+                        </span>
                     </div>
-                  )}
+                    <p className="text-gray-700 mb-4">{insight.description}</p>
 
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium capitalize">{insight.category.replace('_', ' ')}</span>
-                      {' • '}
-                      Generated {new Date(insight.created_at).toLocaleDateString()}
-                    </div>
-                    {insight.status !== 'resolved' && (
-                      <div className="flex gap-2">
-                        {insight.status === 'pending' && (
-                          <button
-                            onClick={() => handleUpdateStatus(insight.id, 'acknowledged')}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
-                          >
-                            Acknowledge
-                          </button>
-                        )}
-                        {(insight.status === 'acknowledged' || insight.status === 'pending') && (
-                          <button
-                            onClick={() => handleUpdateStatus(insight.id, 'in_progress')}
-                            className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm"
-                          >
-                            Start Working
-                          </button>
-                        )}
-                        {insight.status === 'in_progress' && (
-                          <button
-                            onClick={() => handleUpdateStatus(insight.id, 'resolved')}
-                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
-                          >
-                            Mark Resolved
-                          </button>
-                        )}
+                    {insight.recommendation && (
+                      <div className="mb-4 p-4 bg-white bg-opacity-50 rounded">
+                        <h4 className="text-sm font-semibold text-gray-800 mb-2">Recommended Action:</h4>
+                        <p className="text-gray-700">{insight.recommendation}</p>
                       </div>
                     )}
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium capitalize">{formatLabel(insight.category, 'case management')}</span>
+                        {' • '}
+                        Generated {new Date(insight.created_at).toLocaleDateString()}
+                      </div>
+                      {insight.status !== 'resolved' && (
+                        <div className="flex gap-2">
+                          {insight.status === 'pending' && (
+                            <button
+                              onClick={() => handleUpdateStatus(insight.id, 'acknowledged')}
+                              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                            >
+                              Acknowledge
+                            </button>
+                          )}
+                          {(insight.status === 'acknowledged' || insight.status === 'pending') && (
+                            <button
+                              onClick={() => handleUpdateStatus(insight.id, 'in_progress')}
+                              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm"
+                            >
+                              Start Working
+                            </button>
+                          )}
+                          {insight.status === 'in_progress' && (
+                            <button
+                              onClick={() => handleUpdateStatus(insight.id, 'resolved')}
+                              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
+                            >
+                              Mark Resolved
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+            ))
+          )}
+        </div>
+      )}
+    </ICFeatureLayout>
   );
 }
