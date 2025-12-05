@@ -4,7 +4,7 @@ This guide explains how to deploy the **stable MVP snapshot** of KelpHR ConductO
 
 ## Deployment Strategy
 
-- **Render.com**: Deploys `production/stable` branch - stable MVP snapshot
+- **Render.com**: Deploys `render-deployment` branch - stable deployment-ready code
 - **Railway**: Deploys `main` branch - incremental development updates
 
 This separation allows you to maintain a stable production URL on Render while continuing active development on Railway.
@@ -13,16 +13,16 @@ This separation allows you to maintain a stable production URL on Render while c
 
 1. Render.com account (free tier available)
 2. GitHub repository connected to Render
-3. `production/stable` branch created and pushed to GitHub
+3. `render-deployment` branch created and pushed to GitHub
 
-## Step 1: Create Production Stable Branch
+## Step 1: Create Render Deployment Branch
 
-If you haven't already created the checkpoint:
+If you haven't already created the branch:
 
 ```bash
-# Create and push the production/stable branch
-git checkout -b production/stable
-git push origin production/stable
+# Create and push the render-deployment branch
+git checkout -b render-deployment
+git push origin render-deployment
 
 # Return to main for continued development
 git checkout main
@@ -44,7 +44,7 @@ Render will read your `render.yaml` file which defines:
 - **Environment**: Node.js
 - **Region**: Oregon
 - **Plan**: Free
-- **Branch**: `production/stable`
+- **Branch**: `render-deployment`
 - **Build Command**: `npm install && npm run build`
 - **Start Command**: `npm start`
 
@@ -145,21 +145,21 @@ npm run seed:demo
 - Endpoint: `https://conductos-mvp.onrender.com/api/health`
 - Should return: `{"status": "ok", "message": "KelpHR ConductOS API is running"}`
 
-## Updating the Stable Deployment
+## Updating the Render Deployment
 
-When you want to update the production/stable branch with new stable features:
+When you want to update the render-deployment branch with new stable features:
 
 ```bash
 # On main branch, ensure all features are stable
 git checkout main
 git pull origin main
 
-# Merge into production/stable
-git checkout production/stable
+# Merge into render-deployment
+git checkout render-deployment
 git merge main
 
 # Push to trigger Render redeploy
-git push origin production/stable
+git push origin render-deployment
 
 # Return to main for continued development
 git checkout main
@@ -246,7 +246,7 @@ Consider upgrading to Starter plan ($7/month for web, $7/month for database)
 1. Work on `main` branch
 2. Push to `main` → Railway auto-deploys (development environment)
 3. Test features on Railway
-4. When stable, merge to `production/stable` → Render auto-deploys (production environment)
+4. When stable, merge to `render-deployment` → Render auto-deploys (production environment)
 
 ### Example Workflow
 ```bash
@@ -258,9 +258,9 @@ git push origin main
 # Railway deploys automatically
 
 # When feature is stable and tested
-git checkout production/stable
+git checkout render-deployment
 git merge main
-git push origin production/stable
+git push origin render-deployment
 # Render deploys automatically
 
 # Continue development
