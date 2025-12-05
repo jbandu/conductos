@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { MonitoringService } from '../services/monitoring/index.js';
+import { getDashboardMetrics } from '../services/monitoring/simplified.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import db from '../db/pg-init.js';
 
@@ -8,9 +9,10 @@ const monitoring = new MonitoringService();
 
 router.get('/dashboard', requireAuth, requireAdmin, async (req, res) => {
   try {
-    const metrics = await monitoring.getDashboardMetrics();
+    const metrics = await getDashboardMetrics();
     res.json(metrics);
   } catch (error) {
+    console.error('Dashboard error:', error);
     res.status(500).json({ error: error.message });
   }
 });

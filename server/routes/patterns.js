@@ -1,9 +1,24 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
 import { PatternAnalysisEngine } from '../services/patternAnalysis/index.js';
+import db from '../db/pg-init.js';
 
 const router = express.Router();
 const engine = new PatternAnalysisEngine();
+
+// Get all detected patterns
+router.get('/', authenticateToken, async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT * FROM patterns
+      ORDER BY detected_at DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching patterns:', error);
+    res.status(500).json({ error: 'Failed to fetch patterns' });
+  }
+});
 
 router.post('/analyze/:caseId', authenticateToken, async (req, res) => {
   try {

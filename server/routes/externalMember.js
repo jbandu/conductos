@@ -1,8 +1,23 @@
 import express from 'express';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 import externalMemberService from '../services/externalMember/index.js';
+import db from '../db/pg-init.js';
 
 const router = express.Router();
+
+// Get all external members (for admin)
+router.get('/members', authenticateToken, async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT * FROM external_members
+      ORDER BY created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching external members:', error);
+    res.status(500).json({ error: 'Failed to fetch external members' });
+  }
+});
 
 // Dashboard
 router.get('/dashboard', authenticateToken, requireRole(['external_member']), async (req, res) => {

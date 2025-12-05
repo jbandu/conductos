@@ -19,6 +19,11 @@ import ICComposition from './pages/admin/ICComposition';
 import AuditLog from './pages/admin/AuditLog';
 import OrganizationSettings from './pages/admin/OrganizationSettings';
 import ProfilePage from './pages/ProfilePage';
+import KnowledgeBase from './pages/ic/KnowledgeBase';
+import PatternAnalysis from './pages/ic/PatternAnalysis';
+import ProactiveInsights from './pages/ic/ProactiveInsights';
+import ExternalMembers from './pages/admin/ExternalMembers';
+import MonitoringDashboard from './pages/admin/MonitoringDashboard';
 
 function App() {
   return (
@@ -76,6 +81,33 @@ function App() {
           <Route path="/admin/organization" element={
             <ProtectedRoute requiredRole="hr_admin">
               <OrganizationSettings />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/external-members" element={
+            <ProtectedRoute requiredRole="hr_admin">
+              <ExternalMembers />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/monitoring" element={
+            <ProtectedRoute requiredRole="hr_admin">
+              <MonitoringDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* IC Features */}
+          <Route path="/ic/knowledge-base" element={
+            <ProtectedRoute requiredRole="ic_member">
+              <KnowledgeBase />
+            </ProtectedRoute>
+          } />
+          <Route path="/ic/patterns" element={
+            <ProtectedRoute requiredRole="ic_member">
+              <PatternAnalysis />
+            </ProtectedRoute>
+          } />
+          <Route path="/ic/insights" element={
+            <ProtectedRoute requiredRole="ic_member">
+              <ProactiveInsights />
             </ProtectedRoute>
           } />
         </Routes>
