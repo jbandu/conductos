@@ -219,7 +219,7 @@ export default function ChatLayout() {
 
         {/* Input Area - Hide when intake flow is active */}
         {!showIntakeFlow && (
-          <div className="bg-white border-t border-gray-200 p-4">
+          <div className="bg-white border-t border-gray-200 p-3 pb-safe md:p-4">
             {/* Quick Action Chips */}
             <QuickChips chips={chips} onSelect={handleChipSelect} />
 
@@ -236,14 +236,16 @@ export default function ChatLayout() {
                     ? 'Type your message here...'
                     : 'Search cases or ask a question...'
                 }
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[44px]"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px]"
+                aria-label={currentMode === 'employee' ? 'Type your message' : 'Search cases'}
               />
               <button
                 onClick={handleSend}
                 disabled={!inputValue.trim()}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors min-h-[44px] flex items-center justify-center"
+                className="px-4 md:px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-100 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                aria-label="Send message"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
