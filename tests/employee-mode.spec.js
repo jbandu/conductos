@@ -1,14 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { loginAs } from './helpers/apiMocks';
 
 test.describe('Employee Mode', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-
-    // Ensure we're in employee mode
-    const employeeModeButton = page.locator('button:has-text("Employee Mode")');
-    if (await employeeModeButton.isVisible()) {
-      await employeeModeButton.click();
-    }
+    await loginAs(page, 'employee');
   });
 
   test('should display employee portal header', async ({ page }) => {
@@ -30,7 +25,7 @@ test.describe('Employee Mode', () => {
   });
 
   test('should have functional input field', async ({ page }) => {
-    const input = page.locator('input[placeholder*="Type your message"]');
+    const input = page.locator('input[placeholder*="Type your message here"]');
     await expect(input).toBeVisible();
     await expect(input).toBeEditable();
 
@@ -39,7 +34,7 @@ test.describe('Employee Mode', () => {
   });
 
   test('should enable send button when input has text', async ({ page }) => {
-    const input = page.locator('input[placeholder*="Type your message"]');
+    const input = page.locator('input[placeholder*="Type your message here"]');
     const sendButton = page.locator('button[aria-label="Send message"]');
 
     // Send button should be disabled initially
@@ -55,7 +50,7 @@ test.describe('Employee Mode', () => {
   });
 
   test('should send message when send button clicked', async ({ page }) => {
-    const input = page.locator('input[placeholder*="Type your message"]');
+    const input = page.locator('input[placeholder*="Type your message here"]');
     const sendButton = page.locator('button[aria-label="Send message"]');
 
     await input.fill('What is PoSH?');
@@ -72,7 +67,7 @@ test.describe('Employee Mode', () => {
   });
 
   test('should send message when Enter key pressed', async ({ page }) => {
-    const input = page.locator('input[placeholder*="Type your message"]');
+    const input = page.locator('input[placeholder*="Type your message here"]');
 
     await input.fill('What is PoSH?');
     await input.press('Enter');
@@ -92,7 +87,7 @@ test.describe('Employee Mode', () => {
     await expect(page.locator('text=What is PoSH?').first()).toBeVisible();
 
     // System response should appear
-    await expect(page.locator('.bg-white.border.border-gray-200')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.bg-white.border.border-warm-200')).toBeVisible({ timeout: 10000 });
   });
 
   test('should trigger intake flow when report harassment clicked', async ({ page }) => {
@@ -110,7 +105,7 @@ test.describe('Employee Mode', () => {
   });
 
   test('should display timestamps on messages', async ({ page }) => {
-    const input = page.locator('input[placeholder*="Type your message"]');
+    const input = page.locator('input[placeholder*="Type your message here"]');
     await input.fill('Test message');
     await input.press('Enter');
 
@@ -123,7 +118,7 @@ test.describe('Employee Mode', () => {
   });
 
   test('should maintain chat history as user interacts', async ({ page }) => {
-    const input = page.locator('input[placeholder*="Type your message"]');
+    const input = page.locator('input[placeholder*="Type your message here"]');
 
     // Send first message
     await input.fill('First message');
@@ -165,7 +160,7 @@ test.describe('Employee Mode', () => {
   });
 
   test('should display mode badge', async ({ page }) => {
-    const badge = page.locator('.bg-blue-100.text-blue-700:has-text("Employee Mode")');
+    const badge = page.locator('.bg-primary-50.text-primary-600:has-text("Employee Mode")');
     await expect(badge).toBeVisible();
   });
 });

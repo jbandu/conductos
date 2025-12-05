@@ -10,11 +10,19 @@ export default function ProactiveInsights() {
     fetchInsights();
   }, []);
 
+  const normalizeInsight = (insight = {}) => ({
+    ...insight,
+    status: insight?.status || 'unknown',
+    category: insight?.category || 'case_management',
+    priority: insight?.priority || 'low',
+    recommendation: insight?.recommendation || insight?.recommended_action || insight?.recommendations?.join(', ')
+  });
+
   const fetchInsights = async () => {
     try {
       setLoading(true);
       const data = await api.getInsights();
-      setInsights(data);
+      setInsights((data || []).map(normalizeInsight));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -114,9 +122,9 @@ export default function ProactiveInsights() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-xl font-semibold text-gray-900">{insight.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
-                      {insight.status.replace('_', ' ')}
-                    </span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
+                        {insight.status.replace('_', ' ')}
+                      </span>
                   </div>
                   <p className="text-gray-700 mb-4">{insight.description}</p>
 
