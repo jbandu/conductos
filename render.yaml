@@ -28,10 +28,10 @@ services:
       - key: FROM_EMAIL
         value: noreply@conductos.app  # Update with your verified domain
 
-  # PostgreSQL Database
-  - type: pgsql
-    name: conductos-mvp-db
+# PostgreSQL Database
+databases:
+  - name: conductos-mvp-db
     region: oregon
     plan: free
     databaseName: conductos
-    databaseUser: conductos_user
+    user: conductos_user
