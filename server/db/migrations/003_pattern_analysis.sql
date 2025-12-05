@@ -51,6 +51,13 @@ CREATE TABLE IF NOT EXISTS case_similarities (
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN
+    -- Fix embedding dimensionality before building IVFFlat indexes
+    ALTER TABLE IF EXISTS case_characteristics
+      ALTER COLUMN embedding TYPE vector(1536) USING embedding;
+
+    ALTER TABLE IF EXISTS case_patterns
+      ALTER COLUMN embedding TYPE vector(1536) USING embedding;
+
     CREATE INDEX IF NOT EXISTS idx_case_chars_embedding ON case_characteristics USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
   ELSE
     RAISE NOTICE 'Skipping case_characteristics vector index: pgvector extension not installed.';

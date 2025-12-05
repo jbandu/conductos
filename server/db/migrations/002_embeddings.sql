@@ -1,6 +1,16 @@
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN
+    -- Ensure embedding columns have a fixed dimensionality so IVFFlat indexes succeed
+    ALTER TABLE IF EXISTS legal_sections
+      ALTER COLUMN embedding TYPE vector(1536) USING embedding;
+
+    ALTER TABLE IF EXISTS case_law
+      ALTER COLUMN embedding TYPE vector(1536) USING embedding;
+
+    ALTER TABLE IF EXISTS playbooks
+      ALTER COLUMN embedding TYPE vector(1536) USING embedding;
+
     CREATE INDEX IF NOT EXISTS idx_legal_sections_embedding ON legal_sections
       USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
 
