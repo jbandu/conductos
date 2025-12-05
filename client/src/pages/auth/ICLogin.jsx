@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ICLogin() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -23,16 +25,16 @@ export default function ICLogin() {
     setError('');
     setIsLoading(true);
 
-    // TODO: Replace with actual IC authentication API call
     try {
-      // Simulated authentication - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await login(formData.email, formData.password, 'ic_member');
 
-      // For now, just navigate to chat (demo mode)
-      // In production, this would verify IC credentials
-      navigate('/chat');
+      if (result.success) {
+        navigate('/chat');
+      } else {
+        setError(result.error || 'Invalid credentials. Please ensure you have IC member access.');
+      }
     } catch (err) {
-      setError('Invalid credentials. Please ensure you have IC member access.');
+      setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

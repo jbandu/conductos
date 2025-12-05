@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function EmployeeSignup() {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -67,15 +69,21 @@ export default function EmployeeSignup() {
 
     setIsLoading(true);
 
-    // TODO: Replace with actual registration API call
     try {
-      // Simulated registration - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await signup(
+        formData.fullName,
+        formData.email,
+        formData.password,
+        'employee'
+      );
 
-      // For now, just navigate to chat (demo mode)
-      navigate('/chat');
+      if (result.success) {
+        navigate('/chat');
+      } else {
+        setErrors({ submit: result.error || 'Registration failed. Please try again.' });
+      }
     } catch (err) {
-      setErrors({ submit: 'Registration failed. Please try again.' });
+      setErrors({ submit: 'An error occurred. Please try again.' });
     } finally {
       setIsLoading(false);
     }

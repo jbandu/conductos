@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function EmployeeLogin() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -23,15 +25,16 @@ export default function EmployeeLogin() {
     setError('');
     setIsLoading(true);
 
-    // TODO: Replace with actual authentication API call
     try {
-      // Simulated authentication - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await login(formData.email, formData.password, 'employee');
 
-      // For now, just navigate to chat (demo mode)
-      navigate('/chat');
+      if (result.success) {
+        navigate('/chat');
+      } else {
+        setError(result.error || 'Invalid email or password. Please try again.');
+      }
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

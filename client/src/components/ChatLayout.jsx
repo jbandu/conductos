@@ -8,6 +8,7 @@ import IntakeFlow from './IntakeFlow';
 import CaseListMessage from './CaseListMessage';
 import CaseDetailMessage from './CaseDetailMessage';
 import StatusUpdateConfirm from './StatusUpdateConfirm';
+import ICDashboard from './ICDashboard';
 
 const EMPLOYEE_CHIPS = [
   "I want to report harassment",
@@ -167,20 +168,20 @@ export default function ChatLayout() {
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 && !showIntakeFlow ? (
-            <div className="flex items-center justify-center h-full px-4">
-              <div className="text-center max-w-md">
-                <h3 className="text-2xl font-bold text-warm-900 mb-2">
-                  {currentMode === 'employee'
-                    ? 'Welcome to ConductOS'
-                    : 'IC Dashboard'}
-                </h3>
-                <p className="text-warm-600 mb-6">
-                  {currentMode === 'employee'
-                    ? 'How can I help you today? You can report an incident, check case status, or ask questions about workplace policies.'
-                    : 'Manage and review all cases. Use quick actions below to filter and view cases.'}
-                </p>
+            currentMode === 'ic' ? (
+              <ICDashboard onQuickAction={handleChipSelect} />
+            ) : (
+              <div className="flex items-center justify-center h-full px-4">
+                <div className="text-center max-w-md">
+                  <h3 className="text-2xl font-bold text-warm-900 mb-2">
+                    Welcome to ConductOS
+                  </h3>
+                  <p className="text-warm-600 mb-6">
+                    How can I help you today? You can report an incident, check case status, or ask questions about workplace policies.
+                  </p>
+                </div>
               </div>
-            </div>
+            )
           ) : (
             <div className="py-4">
               {messages.map((msg) => {

@@ -37,5 +37,11 @@ export const api = {
     const response = await fetch(`${API_BASE_URL}/cases/${id}/history`);
     if (!response.ok) throw new Error('Failed to fetch case history');
     return response.json();
+  },
+
+  async getDashboardStats() {
+    const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
+    if (!response.ok) throw new Error('Failed to fetch dashboard stats');
+    return response.json();
   }
 };

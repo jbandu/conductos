@@ -50,4 +50,45 @@ router.get('/summary', async (req, res) => {
   }
 });
 
+// GET /api/dashboard/stats - For IC Dashboard
+router.get('/stats', async (req, res) => {
+  try {
+    const allCases = await caseService.getAllCases();
+
+    // Calculate stats
+    const total = allCases.length;
+    const closedCases = allCases.filter(c => c.status === 'closed');
+    const activeCases = allCases.filter(c => c.status !== 'closed');
+    const overdue = activeCases.filter(c => c.is_overdue).length;
+    const dueToday = activeCases.filter(c => c.days_remaining === 0).length;
+
+    // New cases in last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const newCases = allCases.filter(c => {
+      const reportedDate = new Date(c.reported_at);
+      return reportedDate >= sevenDaysAgo;
+    }).length;
+
+    // In progress cases (not new, not closed)
+    const inProgress = activeCases.filter(c =>
+      c.status !== 'new' && c.status !== 'closed'
+    ).length;
+
+    res.json({
+      stats: {
+        total,
+        overdue,
+        dueToday,
+        newCases,
+        inProgress,
+        closed: closedCases.length
+      }
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

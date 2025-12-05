@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import ChatPage from './pages/ChatPage';
 import AboutPoSH from './pages/learn/AboutPoSH';
@@ -11,24 +13,30 @@ import ICLogin from './pages/auth/ICLogin';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Pages */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/learn" element={<AboutPoSH />} />
-        <Route path="/about-posh" element={<AboutPoSH />} />
-        <Route path="/ic" element={<ICLandingPage />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Pages */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/learn" element={<AboutPoSH />} />
+          <Route path="/about-posh" element={<AboutPoSH />} />
+          <Route path="/ic" element={<ICLandingPage />} />
 
-        {/* Authentication */}
-        <Route path="/login" element={<RoleSelection />} />
-        <Route path="/login/employee" element={<EmployeeLogin />} />
-        <Route path="/login/ic" element={<ICLogin />} />
-        <Route path="/signup/employee" element={<EmployeeSignup />} />
+          {/* Authentication */}
+          <Route path="/login" element={<RoleSelection />} />
+          <Route path="/login/employee" element={<EmployeeLogin />} />
+          <Route path="/login/ic" element={<ICLogin />} />
+          <Route path="/signup/employee" element={<EmployeeSignup />} />
 
-        {/* Application */}
-        <Route path="/chat" element={<ChatPage />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Application */}
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

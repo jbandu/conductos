@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChat } from '../contexts/ChatContext';
+import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const { logout, user, isICMember } = useAuth();
   const { currentMode, setCurrentMode, sidebarOpen, setSidebarOpen, clearMessages } = useChat();
   const [recentCases, setRecentCases] = useState([]);
+
+  // Force employee mode for non-IC members
+  useEffect(() => {
+    if (user && !isICMember && currentMode !== 'employee') {
+      setCurrentMode('employee');
+    }
+  }, [user, isICMember, currentMode, setCurrentMode]);
 
   useEffect(() => {
     if (currentMode === 'ic') {
@@ -44,6 +53,7 @@ export default function Sidebar() {
   };
 
   const handleLogout = () => {
+    logout();
     clearMessages();
     navigate('/');
   };
@@ -68,6 +78,13 @@ export default function Sidebar() {
         <div className="p-4 border-b border-warm-800">
           <h1 className="text-xl font-bold">KelpHR</h1>
           <p className="text-sm text-warm-400">ConductOS</p>
+          {user && (
+            <div className="mt-3 pt-3 border-t border-warm-800">
+              <p className="text-xs text-warm-500 uppercase tracking-wide mb-1">Logged in as</p>
+              <p className="text-sm text-white font-medium truncate">{user.fullName}</p>
+              <p className="text-xs text-warm-400 capitalize">{user.role === 'ic_member' ? 'IC Member' : 'Employee'}</p>
+            </div>
+          )}
         </div>
 
         {/* New Chat Button */}
@@ -83,31 +100,33 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Mode Toggle */}
-        <div className="px-4 pb-4 border-b border-warm-800">
-          <div className="bg-warm-800 rounded-lg p-1 flex">
-            <button
-              onClick={handleModeChange}
-              className={`flex-1 px-3 py-2 rounded text-sm transition-colors min-h-[44px] ${
-                currentMode === 'employee'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-warm-400 hover:text-white'
-              }`}
-            >
-              Employee
-            </button>
-            <button
-              onClick={handleModeChange}
-              className={`flex-1 px-3 py-2 rounded text-sm transition-colors min-h-[44px] ${
-                currentMode === 'ic'
-                  ? 'bg-accent-600 text-white'
-                  : 'text-warm-400 hover:text-white'
-              }`}
-            >
-              IC Mode
-            </button>
+        {/* Mode Toggle - Only show for IC members */}
+        {isICMember && (
+          <div className="px-4 pb-4 border-b border-warm-800">
+            <div className="bg-warm-800 rounded-lg p-1 flex">
+              <button
+                onClick={handleModeChange}
+                className={`flex-1 px-3 py-2 rounded text-sm transition-colors min-h-[44px] ${
+                  currentMode === 'employee'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-warm-400 hover:text-white'
+                }`}
+              >
+                Employee
+              </button>
+              <button
+                onClick={handleModeChange}
+                className={`flex-1 px-3 py-2 rounded text-sm transition-colors min-h-[44px] ${
+                  currentMode === 'ic'
+                    ? 'bg-accent-600 text-white'
+                    : 'text-warm-400 hover:text-white'
+                }`}
+              >
+                IC Mode
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Case History (IC Mode only) */}
         {currentMode === 'ic' && (
