@@ -10,13 +10,19 @@ export default function ExternalMembers() {
     fetchMembers();
   }, []);
 
+  const formatInitial = (name) => {
+    if (!name || typeof name !== 'string') return '?';
+    return name.charAt(0).toUpperCase();
+  };
+
   const fetchMembers = async () => {
     try {
       setLoading(true);
       const data = await api.getExternalMembers();
-      setMembers(data);
+      setMembers(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message);
+      setMembers([]);
     } finally {
       setLoading(false);
     }
@@ -61,13 +67,13 @@ export default function ExternalMembers() {
                 <div className="flex-shrink-0">
                   <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
                     <span className="text-2xl font-bold text-primary-700">
-                      {member.name.charAt(0)}
+                      {formatInitial(member?.name)}
                     </span>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{member.name}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{member.email}</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{member?.name || 'Unknown member'}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{member?.email || 'No email provided'}</p>
 
                   {member.organization && (
                     <p className="text-sm text-gray-700 mb-2">
@@ -93,7 +99,9 @@ export default function ExternalMembers() {
                   )}
 
                   <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500">
-                    <p>Added: {new Date(member.created_at).toLocaleDateString()}</p>
+                    <p>
+                      Added: {member?.created_at ? new Date(member.created_at).toLocaleDateString() : 'Date unavailable'}
+                    </p>
                     {member.is_active ? (
                       <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
                         Active
