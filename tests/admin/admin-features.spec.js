@@ -10,15 +10,32 @@ test.describe('Admin Features', () => {
     test('should display dashboard stats', async ({ page }) => {
       await expect(page.locator('text=Admin Dashboard')).toBeVisible();
       await expect(page.locator('text=Total Users')).toBeVisible();
-      await expect(page.locator('text=Active Cases')).toBeVisible();
+      await expect(page.locator('text=Active Users')).toBeVisible();
       await expect(page.locator('text=IC Members')).toBeVisible();
     });
 
     test('should have navigation to all admin pages', async ({ page }) => {
-      await expect(page.locator('a[href="/admin/users"]')).toBeVisible();
-      await expect(page.locator('a[href="/admin/ic-composition"]')).toBeVisible();
-      await expect(page.locator('a[href="/admin/audit-log"]')).toBeVisible();
-      await expect(page.locator('a[href="/admin/organization"]')).toBeVisible();
+      await expect(page.locator('nav a[href="/admin/users"]')).toBeVisible();
+      await expect(page.locator('nav a[href="/admin/ic-composition"]')).toBeVisible();
+      await expect(page.locator('nav a[href="/admin/audit-log"]')).toBeVisible();
+      await expect(page.locator('nav a[href="/admin/organization"]')).toBeVisible();
+    });
+
+    test('sidebar links should navigate to correct admin pages', async ({ page }) => {
+      const navigationChecks = [
+        { link: 'nav a[href="/admin/dashboard"]', expected: 'Admin Dashboard' },
+        { link: 'nav a[href="/admin/users"]', expected: 'User Management' },
+        { link: 'nav a[href="/admin/ic-composition"]', expected: 'IC Composition' },
+        { link: 'nav a[href="/admin/organization"]', expected: 'Organization Settings' },
+        { link: 'nav a[href="/admin/audit-log"]', expected: 'Audit Log' },
+        { link: 'nav a[href="/admin/external-members"]', expected: 'External IC Members' },
+        { link: 'nav a[href="/admin/monitoring"]', expected: 'System Monitoring' }
+      ];
+
+      for (const { link, expected } of navigationChecks) {
+        await page.click(link);
+        await expect(page.locator(`main h1:has-text("${expected}")`)).toBeVisible();
+      }
     });
 
     test('sidebar links should navigate to correct admin pages', async ({ page }) => {
