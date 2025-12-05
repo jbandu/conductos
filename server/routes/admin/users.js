@@ -1,6 +1,9 @@
 import express from 'express';
+import bcrypt from 'bcrypt';
 import pool from '../../db/pg-init.js';
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
+
+const SALT_ROUNDS = 10;
 
 const router = express.Router();
 
@@ -148,12 +151,15 @@ router.post('/', async (req, res) => {
 
     await client.query('BEGIN');
 
-    // Create user (password should be hashed - for MVP using plaintext)
+    // Hash password before storing
+    const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+
+    // Create user
     const result = await client.query(`
       INSERT INTO users (
         full_name,
         email,
-        password,
+        password_hash,
         role,
         organization_id,
         is_active,
@@ -161,7 +167,7 @@ router.post('/', async (req, res) => {
         updated_at
       ) VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())
       RETURNING id, full_name, email, role, is_active, organization_id, created_at
-    `, [full_name, email, password, role, organization_id || null]);
+    `, [full_name, email, password_hash, role, organization_id || null]);
 
     const newUser = result.rows[0];
 
