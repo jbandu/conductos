@@ -11,7 +11,7 @@ export async function getDashboardMetrics() {
         PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY response_time_ms) AS p95,
         PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY response_time_ms) AS p99
       FROM api_request_logs
-      WHERE timestamp > NOW() - INTERVAL '24 hours'
+      WHERE created_at > NOW() - INTERVAL '24 hours'
     `);
     const apiHealth = apiHealthResult.rows[0] || {};
 
@@ -29,9 +29,9 @@ export async function getDashboardMetrics() {
 
     // Get recent requests for the table
     const recentRequestsResult = await db.query(`
-      SELECT method, path, status_code, response_time_ms, timestamp
+      SELECT method, path, status_code, response_time_ms, created_at
       FROM api_request_logs
-      ORDER BY timestamp DESC
+      ORDER BY created_at DESC
       LIMIT 20
     `);
 

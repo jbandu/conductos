@@ -212,7 +212,7 @@ export default function MonitoringDashboard() {
                           {req.response_time_ms}ms
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {new Date(req.timestamp).toLocaleTimeString()}
+                          {new Date(req.created_at).toLocaleTimeString()}
                         </td>
                       </tr>
                     ))}
