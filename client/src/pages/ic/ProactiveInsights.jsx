@@ -59,6 +59,11 @@ export default function ProactiveInsights() {
     return colors[status] || 'bg-gray-100 text-gray-700';
   };
 
+  const formatLabel = (value, fallback = '') => {
+    const label = value ?? fallback;
+    return typeof label === 'string' ? label.replace('_', ' ') : String(label);
+  };
+
   const getCategoryIcon = (category) => {
     const icons = {
       'compliance': (
@@ -123,7 +128,7 @@ export default function ProactiveInsights() {
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-xl font-semibold text-gray-900">{insight.title}</h3>
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(insight.status)}`}>
-                        {insight.status.replace('_', ' ')}
+                        {formatLabel(insight.status, 'unknown')}
                       </span>
                   </div>
                   <p className="text-gray-700 mb-4">{insight.description}</p>
@@ -137,7 +142,7 @@ export default function ProactiveInsights() {
 
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600">
-                      <span className="font-medium capitalize">{insight.category.replace('_', ' ')}</span>
+                      <span className="font-medium capitalize">{formatLabel(insight.category, 'case management')}</span>
                       {' • '}
                       Generated {new Date(insight.created_at).toLocaleDateString()}
                     </div>
