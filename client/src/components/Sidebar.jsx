@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useChat } from '../contexts/ChatContext';
 import { api } from '../services/api';
 
 export default function Sidebar() {
+  const navigate = useNavigate();
   const { currentMode, setCurrentMode, sidebarOpen, setSidebarOpen, clearMessages } = useChat();
   const [recentCases, setRecentCases] = useState([]);
 
@@ -39,6 +41,11 @@ export default function Sidebar() {
     if (window.dispatchEvent) {
       window.dispatchEvent(new CustomEvent('viewCase', { detail: { caseCode } }));
     }
+  };
+
+  const handleLogout = () => {
+    clearMessages();
+    navigate('/');
   };
 
   return (
@@ -141,9 +148,22 @@ export default function Sidebar() {
           </div>
         )}
 
-        {/* Version/Footer */}
+        {/* Logout Button */}
         <div className="p-4 border-t border-warm-700">
-          <p className="text-xs text-warm-500">v1.0.0</p>
+          <button
+            onClick={handleLogout}
+            className="w-full px-4 py-2.5 bg-warm-800 hover:bg-warm-700 rounded-lg transition-colors min-h-[44px] flex items-center justify-center gap-2 text-warm-300 hover:text-white"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </button>
+        </div>
+
+        {/* Version Footer */}
+        <div className="px-4 pb-4">
+          <p className="text-xs text-warm-500 text-center">v1.0.0</p>
         </div>
       </aside>
     </>
