@@ -45,14 +45,14 @@ function StatusTimeline({ history }) {
 
   return (
     <div className="mt-6">
-      <h4 className="text-sm font-semibold text-gray-700 mb-3">Status History</h4>
+      <h4 className="text-sm font-semibold text-warm-700 mb-3">Status History</h4>
       <div className="space-y-3">
         {history.map((entry, index) => (
           <div key={entry.id} className="flex gap-3">
             <div className="flex flex-col items-center">
-              <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'}`} />
+              <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-500' : 'bg-warm-300'}`} />
               {index !== history.length - 1 && (
-                <div className="w-0.5 h-full bg-gray-200 mt-1" />
+                <div className="w-0.5 h-full bg-warm-200 mt-1" />
               )}
             </div>
 
@@ -63,15 +63,15 @@ function StatusTimeline({ history }) {
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[entry.old_status]}`}>
                       {STATUS_LABELS[entry.old_status]}
                     </span>
-                    <span className="text-gray-400">→</span>
+                    <span className="text-warm-400">→</span>
                   </>
                 )}
                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[entry.new_status]}`}>
                   {STATUS_LABELS[entry.new_status]}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mb-1">{entry.notes}</p>
-              <p className="text-xs text-gray-400">{formatDateTime(entry.changed_at)}</p>
+              <p className="text-sm text-warm-600 mb-1">{entry.notes}</p>
+              <p className="text-xs text-warm-400">{formatDateTime(entry.changed_at)}</p>
             </div>
           </div>
         ))}
@@ -88,10 +88,10 @@ export default function CaseDetailMessage({ caseData, history }) {
   const needsTruncation = caseData.description.length > 200;
 
   return (
-    <div className="border border-gray-200 rounded-lg p-6 bg-white">
+    <div className="border border-warm-200 rounded-lg p-6 bg-white">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-warm-900 mb-2">
             {caseData.case_code}
           </h2>
           <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export default function CaseDetailMessage({ caseData, history }) {
               {STATUS_LABELS[caseData.status]}
             </span>
             {caseData.is_anonymous && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-warm-100 text-warm-700">
                 🔒 Anonymous
               </span>
             )}
@@ -107,18 +107,18 @@ export default function CaseDetailMessage({ caseData, history }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-warm-50 rounded-lg">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Filed</p>
-          <p className="text-sm font-medium text-gray-900">{formatDate(caseData.created_at)}</p>
+          <p className="text-xs text-warm-500 mb-1">Filed</p>
+          <p className="text-sm font-medium text-warm-900">{formatDate(caseData.created_at)}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Incident Date</p>
-          <p className="text-sm font-medium text-gray-900">{formatDate(caseData.incident_date)}</p>
+          <p className="text-xs text-warm-500 mb-1">Incident Date</p>
+          <p className="text-sm font-medium text-warm-900">{formatDate(caseData.incident_date)}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Deadline</p>
-          <p className="text-sm font-medium text-gray-900">{formatDate(caseData.deadline_date)}</p>
+          <p className="text-xs text-warm-500 mb-1">Deadline</p>
+          <p className="text-sm font-medium text-warm-900">{formatDate(caseData.deadline_date)}</p>
         </div>
       </div>
 
@@ -145,37 +145,37 @@ export default function CaseDetailMessage({ caseData, history }) {
             </span>
           </div>
         ) : (
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-warm-600">
             {daysRemaining} days remaining until deadline
           </div>
         )}
       </div>
 
       <div className="mb-6">
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">Description</h3>
-        <p className="text-sm text-gray-600 whitespace-pre-wrap">
+        <h3 className="text-sm font-semibold text-warm-700 mb-2">Description</h3>
+        <p className="text-sm text-warm-600 whitespace-pre-wrap">
           {showFullDescription || !needsTruncation ? caseData.description : descriptionPreview + '...'}
         </p>
         {needsTruncation && (
           <button
             onClick={() => setShowFullDescription(!showFullDescription)}
-            className="text-sm text-blue-600 hover:text-blue-700 mt-2 font-medium"
+            className="text-sm text-primary-600 hover:text-primary-700 mt-2 font-medium"
           >
             {showFullDescription ? 'Show less' : 'Show more'}
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-warm-50 rounded-lg">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Conciliation Requested</p>
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-xs text-warm-500 mb-1">Conciliation Requested</p>
+          <p className="text-sm font-medium text-warm-900">
             {caseData.conciliation_requested ? 'Yes' : 'No'}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Complainant</p>
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-xs text-warm-500 mb-1">Complainant</p>
+          <p className="text-sm font-medium text-warm-900">
             {caseData.is_anonymous
               ? `${caseData.anonymous_alias || 'Anonymous'} (Limited disclosure)`
               : caseData.complainant_name

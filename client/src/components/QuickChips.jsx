@@ -10,7 +10,7 @@ export default function QuickChips({ chips, onSelect }) {
           <button
             key={index}
             onClick={() => onSelect(chip)}
-            className="flex-shrink-0 px-4 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 text-gray-700 text-sm md:text-base rounded-full border border-gray-300 transition-all duration-100 min-h-[44px] whitespace-nowrap font-medium"
+            className="flex-shrink-0 px-4 py-2 bg-primary-50 hover:bg-primary-100 active:bg-primary-200 active:scale-95 text-primary-700 text-sm md:text-base rounded-full border border-primary-200 transition-all duration-100 min-h-[44px] whitespace-nowrap font-medium"
           >
             {chip}
           </button>

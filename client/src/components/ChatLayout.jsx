@@ -125,18 +125,18 @@ export default function ChatLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gentle">
       <Sidebar />
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between">
+        <header className="bg-white border-b border-warm-200 px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Hamburger Menu (Mobile) */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 hover:bg-gray-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="md:hidden p-2 hover:bg-warm-50 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -144,10 +144,10 @@ export default function ChatLayout() {
             </button>
 
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-warm-900">
                 {currentMode === 'employee' ? 'Employee Portal' : 'Investigation Committee'}
               </h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-warm-600">
                 {currentMode === 'employee' ? 'Submit and track your cases' : 'Manage all cases'}
               </p>
             </div>
@@ -156,8 +156,8 @@ export default function ChatLayout() {
           <div className="flex items-center gap-2">
             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
               currentMode === 'employee'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-purple-100 text-purple-700'
+                ? 'bg-primary-50 text-primary-600'
+                : 'bg-accent-500/10 text-accent-600'
             }`}>
               {currentMode === 'employee' ? 'Employee Mode' : 'IC Mode'}
             </span>
@@ -169,12 +169,12 @@ export default function ChatLayout() {
           {messages.length === 0 && !showIntakeFlow ? (
             <div className="flex items-center justify-center h-full px-4">
               <div className="text-center max-w-md">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h3 className="text-2xl font-bold text-warm-900 mb-2">
                   {currentMode === 'employee'
                     ? 'Welcome to ConductOS'
                     : 'IC Dashboard'}
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-warm-600 mb-6">
                   {currentMode === 'employee'
                     ? 'How can I help you today? You can report an incident, check case status, or ask questions about workplace policies.'
                     : 'Manage and review all cases. Use quick actions below to filter and view cases.'}
@@ -239,7 +239,7 @@ export default function ChatLayout() {
 
         {/* Input Area - Hide when intake flow is active */}
         {!showIntakeFlow && (
-          <div className="bg-white border-t border-gray-200 p-3 pb-safe md:p-4">
+          <div className="bg-white border-t border-warm-200 p-3 pb-safe md:p-4">
             {/* Quick Action Chips */}
             <QuickChips chips={chips} onSelect={handleChipSelect} />
 
@@ -256,13 +256,13 @@ export default function ChatLayout() {
                     ? 'Type your message here...'
                     : 'Search cases or ask a question...'
                 }
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px]"
+                className="flex-1 px-4 py-3 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base min-h-[48px]"
                 aria-label={currentMode === 'employee' ? 'Type your message' : 'Search cases'}
               />
               <button
                 onClick={handleSend}
                 disabled={!inputValue.trim()}
-                className="px-4 md:px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-100 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                className="px-4 md:px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 disabled:bg-warm-300 disabled:cursor-not-allowed transition-all duration-100 min-w-[48px] min-h-[48px] flex items-center justify-center"
                 aria-label="Send message"
               >
                 <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
