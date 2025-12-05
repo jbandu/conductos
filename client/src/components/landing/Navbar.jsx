@@ -36,14 +36,14 @@ export default function Navbar() {
           {/* Login Buttons */}
           <div className="flex items-center space-x-3">
             <Link
-              to="/chat"
+              to="/login/employee"
               className="px-4 py-2 text-warm-700 hover:text-primary-600 font-medium transition-colors text-sm"
             >
               Employee Login
             </Link>
             <Link
-              to="/chat"
-              className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition-all hover:scale-105 shadow-sm text-sm"
+              to="/login/ic"
+              className="px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg font-medium transition-all hover:scale-105 shadow-sm text-sm"
             >
               IC Member Login
             </Link>

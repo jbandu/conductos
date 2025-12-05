@@ -8,6 +8,7 @@ import { existsSync } from 'fs';
 import casesRouter from './routes/cases.js';
 import chatRouter from './routes/chat.js';
 import dashboardRouter from './routes/dashboard.js';
+import authRouter from './routes/auth.js';
 import { initializeDatabase } from './db/pg-init.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,6 +27,7 @@ app.use(cors({
 app.use(express.json());
 
 // API Routes (must come before static files)
+app.use('/api/auth', authRouter);
 app.use('/api/cases', casesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/dashboard', dashboardRouter);
