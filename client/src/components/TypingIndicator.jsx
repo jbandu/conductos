@@ -1,15 +1,17 @@
 import React from 'react';
+import { ChatBubble } from './design-system';
+import { useAuth } from '../contexts/AuthContext';
+
+/**
+ * TypingIndicator Component
+ *
+ * Shows animated dots when the system is processing a message.
+ * Uses the design system ChatBubble.Typing for consistent styling.
+ */
 
 export default function TypingIndicator() {
-  return (
-    <div className="flex justify-start mb-4 px-4">
-      <div className="bg-white border border-gray-200 rounded-lg rounded-bl-none px-4 py-3">
-        <div className="flex gap-1">
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-        </div>
-      </div>
-    </div>
-  );
+  const { user } = useAuth();
+  const role = user?.role === 'ic_member' ? 'ic' : user?.role === 'hr_admin' ? 'admin' : 'employee';
+
+  return <ChatBubble.Typing role={role} />;
 }

@@ -1,46 +1,59 @@
 import React from 'react';
+import { ChatBubble } from './design-system';
+import { useAuth } from '../contexts/AuthContext';
+import CaseListMessage from './CaseListMessage';
+import CaseDetailMessage from './CaseDetailMessage';
+import StatusUpdateConfirm from './StatusUpdateConfirm';
 
-function formatRelativeTime(timestamp) {
-  const now = new Date();
-  const time = new Date(timestamp);
-  const diffMs = now - time;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} min ago`;
-  if (diffHours < 24) {
-    return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-  return time.toLocaleDateString([], { month: 'short', day: 'numeric' });
-}
+/**
+ * ChatMessage Component
+ *
+ * Wrapper that renders appropriate message type using the design system ChatBubble.
+ * Handles rich message types (case lists, case details, etc.)
+ */
 
 export default function ChatMessage({ type, content, timestamp }) {
+  const { user } = useAuth();
   const isUser = type === 'user';
 
+  // Determine role for styling
+  const role = user?.role === 'ic_member' ? 'ic' : user?.role === 'hr_admin' ? 'admin' : 'employee';
+
+  // Handle rich message types
+  if (typeof content === 'object' && content.type) {
+    switch (content.type) {
+      case 'case_list':
+        return (
+          <div className="px-4 mb-4">
+            <CaseListMessage {...content} />
+          </div>
+        );
+      case 'case_detail':
+        return (
+          <div className="px-4 mb-4">
+            <CaseDetailMessage {...content} />
+          </div>
+        );
+      case 'case_update_success':
+        return (
+          <div className="px-4 mb-4">
+            <StatusUpdateConfirm {...content} />
+          </div>
+        );
+      default:
+        // Fallback to regular message
+        break;
+    }
+  }
+
+  // Regular text message
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 px-3 md:px-4 md:mb-4`}>
-      <div
-        className={`max-w-[90%] md:max-w-[85%] lg:max-w-[70%] rounded-lg px-3 py-2.5 md:px-4 md:py-3 ${
-          isUser
-            ? 'bg-primary-600 text-white rounded-br-none'
-            : 'bg-white border border-warm-200 rounded-bl-none shadow-sm'
-        }`}
-      >
-        <p className="text-base whitespace-pre-wrap break-words leading-relaxed">
-          {content}
-        </p>
-        {timestamp && (
-          <p
-            className={`text-xs mt-1.5 ${
-              isUser ? 'text-primary-100' : 'text-warm-400'
-            }`}
-            title={new Date(timestamp).toLocaleString()}
-          >
-            {formatRelativeTime(timestamp)}
-          </p>
-        )}
-      </div>
-    </div>
+    <ChatBubble
+      type={type}
+      content={typeof content === 'string' ? content : JSON.stringify(content)}
+      timestamp={timestamp}
+      role={role}
+      status={isUser ? 'sent' : undefined}
+    />
   );
 }
