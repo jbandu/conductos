@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import { Card, Badge, Input } from '../../components/design-system';
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -164,12 +165,12 @@ export default function UserManagement() {
     setShowEditModal(true);
   };
 
-  const getRoleBadgeColor = (role) => {
+  const getRoleBadgeVariant = (role) => {
     switch (role) {
-      case 'hr_admin': return 'bg-indigo-100 text-indigo-700';
-      case 'ic_member': return 'bg-purple-100 text-purple-700';
-      case 'employee': return 'bg-blue-100 text-blue-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'hr_admin': return 'neutral';
+      case 'ic_member': return 'info';
+      case 'employee': return 'info';
+      default: return 'neutral';
     }
   };
 
@@ -184,22 +185,22 @@ export default function UserManagement() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
+      <div className="p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-2">Manage system users, roles, and permissions</p>
+          <h1 className="text-display-lg text-warm-900 mb-2">User Management</h1>
+          <p className="text-body text-warm-600">Manage system users, roles, and permissions</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
             {error}
           </div>
         )}
 
         {/* Filters and Actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <Card className="mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -208,7 +209,7 @@ export default function UserManagement() {
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
               />
             </div>
 
@@ -216,7 +217,7 @@ export default function UserManagement() {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
             >
               <option value="all">All Roles</option>
               <option value="employee">Employee</option>
@@ -228,7 +229,7 @@ export default function UserManagement() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -241,7 +242,7 @@ export default function UserManagement() {
                 setFormData({ full_name: '', email: '', password: '', role: 'employee' });
                 setShowAddModal(true);
               }}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 whitespace-nowrap"
+              className="px-6 py-2 bg-admin-600 text-white rounded-lg hover:bg-admin-700 transition-colors flex items-center gap-2 whitespace-nowrap"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -249,67 +250,63 @@ export default function UserManagement() {
               Add User
             </button>
           </div>
-        </div>
+        </Card>
 
         {/* Users Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <Card padding="none">
           {isLoading ? (
-            <div className="p-8 text-center text-gray-500">Loading users...</div>
+            <div className="p-8 text-center text-warm-600">Loading users...</div>
           ) : filteredUsers.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No users found</div>
+            <div className="p-8 text-center text-warm-600">No users found</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-warm-50 border-b border-warm-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-warm-600 uppercase tracking-wider">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-warm-600 uppercase tracking-wider">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-warm-600 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-warm-600 uppercase tracking-wider">
                       Last Login
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-warm-600 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-warm-100">
                   {filteredUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={user.id} className="hover:bg-warm-25 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium text-warm-900">
                             {user.full_name}
                             {user.is_super_admin && (
-                              <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
+                              <Badge variant="warning" size="sm" className="ml-2">
                                 Super Admin
-                              </span>
+                              </Badge>
                             )}
                           </span>
-                          <span className="text-sm text-gray-500">{user.email}</span>
+                          <span className="text-sm text-warm-500">{user.email}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+                        <Badge variant={getRoleBadgeVariant(user.role)}>
                           {getRoleLabel(user.role)}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          user.is_active
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-700'
-                        }`}>
+                        <Badge variant={user.is_active ? 'success' : 'neutral'}>
                           {user.is_active ? 'Active' : 'Inactive'}
-                        </span>
+                        </Badge>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-6 py-4 text-sm text-warm-600">
                         {user.last_login_at
                           ? new Date(user.last_login_at).toLocaleDateString()
                           : 'Never'}
@@ -318,7 +315,7 @@ export default function UserManagement() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openEditModal(user)}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className="text-admin-600 hover:text-admin-700 transition-colors"
                             title="Edit user"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,10 +325,10 @@ export default function UserManagement() {
                           {!user.is_super_admin && (
                             <button
                               onClick={() => handleToggleStatus(user.id, user.is_active)}
-                              className={`${
+                              className={`transition-colors ${
                                 user.is_active
-                                  ? 'text-red-600 hover:text-red-900'
-                                  : 'text-green-600 hover:text-green-900'
+                                  ? 'text-red-600 hover:text-red-700'
+                                  : 'text-green-600 hover:text-green-700'
                               }`}
                               title={user.is_active ? 'Deactivate user' : 'Activate user'}
                             >
@@ -354,10 +351,10 @@ export default function UserManagement() {
               </table>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Summary */}
-        <div className="mt-4 text-sm text-gray-500">
+        <div className="mt-4 text-sm text-warm-600">
           Showing {filteredUsers.length} of {users.length} users
         </div>
       </div>
@@ -379,7 +376,7 @@ export default function UserManagement() {
                     required
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
                   />
                 </div>
 
@@ -392,7 +389,7 @@ export default function UserManagement() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
                   />
                 </div>
 
@@ -405,7 +402,7 @@ export default function UserManagement() {
                     required
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
                   />
                 </div>
 
@@ -416,7 +413,7 @@ export default function UserManagement() {
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
                   >
                     <option value="employee">Employee</option>
                     <option value="ic_member">IC Member</option>
@@ -435,7 +432,7 @@ export default function UserManagement() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-admin-600 text-white rounded-lg hover:bg-admin-700 transition-colors"
                 >
                   Create User
                 </button>
@@ -462,7 +459,7 @@ export default function UserManagement() {
                     required
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
                   />
                 </div>
 
@@ -475,7 +472,7 @@ export default function UserManagement() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
                   />
                 </div>
 
@@ -486,7 +483,7 @@ export default function UserManagement() {
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:ring-2 focus:ring-admin-500 focus:border-admin-500"
                     disabled={selectedUser.is_super_admin}
                   >
                     <option value="employee">Employee</option>
@@ -514,7 +511,7 @@ export default function UserManagement() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-admin-600 text-white rounded-lg hover:bg-admin-700 transition-colors"
                 >
                   Save Changes
                 </button>

@@ -80,17 +80,18 @@ export default function AdminLayout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gentle flex">
       {/* Sidebar */}
-      <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-indigo-900 text-white transition-all duration-300 flex flex-col`}>
+      <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-admin-600 text-white transition-all duration-300 flex flex-col shadow-lg`}>
         {/* Logo & Toggle */}
-        <div className="p-4 flex items-center justify-between">
+        <div className="p-4 flex items-center justify-between border-b border-admin-700">
           {isSidebarOpen && (
             <h1 className="text-xl font-bold">ConductOS Admin</h1>
           )}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-indigo-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-admin-700 rounded-lg transition-colors"
+            aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isSidebarOpen ? "M11 19l-7-7 7-7m8 14l-7-7 7-7" : "M13 5l7 7-7 7M5 5l7 7-7 7"} />
@@ -106,10 +107,10 @@ export default function AdminLayout({ children }) {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${
                   isActive
-                    ? 'bg-indigo-800 text-white'
-                    : 'text-indigo-100 hover:bg-indigo-800'
+                    ? 'bg-admin-700 text-white shadow-sm'
+                    : 'text-white/80 hover:bg-admin-700 hover:text-white'
                 }`}
                 title={!isSidebarOpen ? item.name : ''}
               >
@@ -123,9 +124,9 @@ export default function AdminLayout({ children }) {
         </nav>
 
         {/* User Info */}
-        <div className="border-t border-indigo-800 p-4">
+        <div className="border-t border-admin-700 p-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-indigo-700 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-admin-700 rounded-full flex items-center justify-center shadow-sm">
               <span className="text-sm font-semibold">
                 {user?.fullName?.[0] || 'A'}
               </span>
@@ -133,7 +134,7 @@ export default function AdminLayout({ children }) {
             {isSidebarOpen && (
               <div className="ml-3 flex-1">
                 <p className="text-sm font-medium">{user?.fullName}</p>
-                <p className="text-xs text-indigo-300">
+                <p className="text-xs text-white/70">
                   {user?.is_super_admin ? 'Super Admin' : 'Admin'}
                 </p>
               </div>
@@ -142,7 +143,7 @@ export default function AdminLayout({ children }) {
           {isSidebarOpen && (
             <button
               onClick={handleLogout}
-              className="mt-3 w-full flex items-center justify-center px-3 py-2 bg-indigo-800 hover:bg-indigo-700 rounded-lg transition-colors text-sm font-medium"
+              className="mt-3 w-full flex items-center justify-center px-3 py-2 bg-admin-700 hover:bg-admin-800 rounded-lg transition-colors text-sm font-medium"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
