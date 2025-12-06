@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { Card, Badge } from './design-system';
 
-const STATUS_STYLES = {
-  new: 'bg-blue-100 text-blue-800',
-  under_review: 'bg-purple-100 text-purple-800',
-  conciliation: 'bg-yellow-100 text-yellow-800',
-  investigating: 'bg-orange-100 text-orange-800',
-  decision_pending: 'bg-red-100 text-red-800',
-  closed: 'bg-green-100 text-green-800'
+const STATUS_VARIANTS = {
+  new: 'info',
+  under_review: 'neutral',
+  conciliation: 'warning',
+  investigating: 'warning',
+  decision_pending: 'danger',
+  closed: 'success'
 };
 
 const STATUS_LABELS = {
@@ -60,15 +61,15 @@ function StatusTimeline({ history }) {
               <div className="flex items-center gap-2 mb-1">
                 {entry.old_status && (
                   <>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[entry.old_status]}`}>
+                    <Badge size="sm" variant={STATUS_VARIANTS[entry.old_status] || 'neutral'}>
                       {STATUS_LABELS[entry.old_status]}
-                    </span>
+                    </Badge>
                     <span className="text-warm-400">→</span>
                   </>
                 )}
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[entry.new_status]}`}>
+                <Badge size="sm" variant={STATUS_VARIANTS[entry.new_status] || 'neutral'}>
                   {STATUS_LABELS[entry.new_status]}
-                </span>
+                </Badge>
               </div>
               <p className="text-sm text-warm-600 mb-1">{entry.notes}</p>
               <p className="text-xs text-warm-400">{formatDateTime(entry.changed_at)}</p>
@@ -88,20 +89,20 @@ export default function CaseDetailMessage({ caseData, history }) {
   const needsTruncation = caseData.description.length > 200;
 
   return (
-    <div className="border border-warm-200 rounded-lg p-6 bg-white">
+    <Card padding="comfortable">
       <div className="flex items-start justify-between mb-4">
         <div>
           <h2 className="text-2xl font-bold text-warm-900 mb-2">
             {caseData.case_code}
           </h2>
           <div className="flex items-center gap-2">
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_STYLES[caseData.status]}`}>
+            <Badge variant={STATUS_VARIANTS[caseData.status] || 'neutral'}>
               {STATUS_LABELS[caseData.status]}
-            </span>
+            </Badge>
             {caseData.is_anonymous && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-warm-100 text-warm-700">
+              <Badge variant="neutral">
                 🔒 Anonymous
-              </span>
+              </Badge>
             )}
           </div>
         </div>
@@ -159,7 +160,7 @@ export default function CaseDetailMessage({ caseData, history }) {
         {needsTruncation && (
           <button
             onClick={() => setShowFullDescription(!showFullDescription)}
-            className="text-sm text-primary-600 hover:text-primary-700 mt-2 font-medium"
+            className="text-sm text-accent-600 hover:text-accent-700 mt-2 font-medium transition-colors"
           >
             {showFullDescription ? 'Show less' : 'Show more'}
           </button>
@@ -185,6 +186,6 @@ export default function CaseDetailMessage({ caseData, history }) {
       </div>
 
       <StatusTimeline history={history} />
-    </div>
+    </Card>
   );
 }

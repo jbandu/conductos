@@ -1,12 +1,13 @@
 import React from 'react';
+import { Card, Badge } from './design-system';
 
-const STATUS_STYLES = {
-  new: 'bg-blue-100 text-blue-800',
-  under_review: 'bg-purple-100 text-purple-800',
-  conciliation: 'bg-yellow-100 text-yellow-800',
-  investigating: 'bg-orange-100 text-orange-800',
-  decision_pending: 'bg-red-100 text-red-800',
-  closed: 'bg-green-100 text-green-800'
+const STATUS_VARIANTS = {
+  new: 'info',
+  under_review: 'neutral',
+  conciliation: 'warning',
+  investigating: 'warning',
+  decision_pending: 'danger',
+  closed: 'success'
 };
 
 const STATUS_LABELS = {
@@ -37,23 +38,24 @@ function CaseCard({ caseData, onCaseClick }) {
   };
 
   return (
-    <div
-      className="border border-warm-200 rounded-lg p-4 hover:border-warm-300 hover:shadow-sm transition-all cursor-pointer bg-white"
+    <Card
+      hover
+      className="cursor-pointer transition-all duration-200 hover:border-accent-300"
       onClick={handleClick}
     >
       {/* Header: Case Code + Status */}
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-warm-900 text-lg hover:text-primary-600">
+          <h3 className="font-semibold text-warm-900 text-lg hover:text-accent-600 transition-colors">
             {caseData.case_code}
           </h3>
           <p className="text-sm text-warm-500 mt-1">
             Incident: {formatDate(caseData.incident_date)}
           </p>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[caseData.status]}`}>
+        <Badge variant={STATUS_VARIANTS[caseData.status] || 'neutral'}>
           {STATUS_LABELS[caseData.status]}
-        </span>
+        </Badge>
       </div>
 
       {/* Description Preview */}
@@ -103,7 +105,7 @@ function CaseCard({ caseData, onCaseClick }) {
           )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import { Card, Badge } from './design-system';
 
 export default function ICDashboard({ onQuickAction }) {
   const [stats, setStats] = useState({
@@ -35,7 +36,7 @@ export default function ICDashboard({ onQuickAction }) {
   };
 
   const StatCard = ({ title, value, icon, color, subtitle }) => (
-    <div className="bg-white rounded-lg border border-warm-200 p-5 hover:shadow-md transition-shadow">
+    <Card hover padding="comfortable">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-warm-600 mb-1">{title}</p>
@@ -48,20 +49,20 @@ export default function ICDashboard({ onQuickAction }) {
           {icon}
         </div>
       </div>
-    </div>
+    </Card>
   );
 
-  const QuickActionButton = ({ title, description, icon, onClick, color = "primary" }) => (
+  const QuickActionButton = ({ title, description, icon, onClick, color = "accent" }) => (
     <button
       onClick={onClick}
-      className={`w-full text-left p-4 bg-white border border-warm-200 rounded-lg hover:border-${color}-300 hover:shadow-sm transition-all group`}
+      className="w-full text-left p-4 bg-white border-2 border-warm-200 rounded-xl hover:border-accent-300 hover:shadow-sm hover:scale-[1.02] transition-all group"
     >
       <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-lg bg-${color}-50 flex items-center justify-center flex-shrink-0 group-hover:bg-${color}-100 transition-colors`}>
+        <div className={`w-10 h-10 rounded-lg bg-accent-50 flex items-center justify-center flex-shrink-0 group-hover:bg-accent-100 transition-colors`}>
           {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-warm-900 group-hover:text-primary-600 transition-colors">{title}</p>
+          <p className="font-medium text-warm-900 group-hover:text-accent-600 transition-colors">{title}</p>
           <p className="text-sm text-warm-600 mt-0.5">{description}</p>
         </div>
       </div>
@@ -177,16 +178,18 @@ export default function ICDashboard({ onQuickAction }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Cases */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg border border-warm-200 overflow-hidden">
-            <div className="px-5 py-4 border-b border-warm-200 flex items-center justify-between">
-              <h3 className="font-semibold text-warm-900">Recent Cases</h3>
-              <button
-                onClick={() => onQuickAction('Show All Cases')}
-                className="text-sm text-accent-600 hover:text-accent-700 font-medium"
-              >
-                View All
-              </button>
-            </div>
+          <Card padding="none">
+            <Card.Header>
+              <div className="flex items-center justify-between w-full">
+                <h3 className="font-semibold text-warm-900">Recent Cases</h3>
+                <button
+                  onClick={() => onQuickAction('Show All Cases')}
+                  className="text-sm text-accent-600 hover:text-accent-700 font-medium transition-colors"
+                >
+                  View All
+                </button>
+              </div>
+            </Card.Header>
 
             <div className="overflow-x-auto">
               {recentCases.length === 0 ? (
@@ -210,11 +213,11 @@ export default function ICDashboard({ onQuickAction }) {
                   <tbody className="divide-y divide-warm-100">
                     {recentCases.map((caseItem) => {
                       const daysOpen = calculateDaysOpen(caseItem);
-                      const statusColors = {
-                        'new': 'bg-blue-50 text-blue-700',
-                        'investigating': 'bg-accent-50 text-accent-700',
-                        'closed': 'bg-green-50 text-green-700',
-                        'escalated': 'bg-red-50 text-red-700'
+                      const statusVariants = {
+                        'new': 'info',
+                        'investigating': 'warning',
+                        'closed': 'success',
+                        'escalated': 'danger'
                       };
 
                       return (
@@ -223,9 +226,9 @@ export default function ICDashboard({ onQuickAction }) {
                             <span className="text-sm font-medium text-warm-900">{caseItem.case_code}</span>
                           </td>
                           <td className="px-5 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[caseItem.status] || 'bg-warm-100 text-warm-700'}`}>
+                            <Badge variant={statusVariants[caseItem.status] || 'neutral'}>
                               {caseItem.status}
-                            </span>
+                            </Badge>
                           </td>
                           <td className="px-5 py-4 whitespace-nowrap">
                             <span className="text-sm text-warm-600 capitalize">{caseItem.severity || 'medium'}</span>
@@ -238,7 +241,7 @@ export default function ICDashboard({ onQuickAction }) {
                           <td className="px-5 py-4 whitespace-nowrap">
                             <button
                               onClick={() => onQuickAction(`status ${caseItem.case_code}`)}
-                              className="text-sm text-accent-600 hover:text-accent-700 font-medium"
+                              className="text-sm text-accent-600 hover:text-accent-700 font-medium transition-colors"
                             >
                               View
                             </button>
@@ -250,13 +253,16 @@ export default function ICDashboard({ onQuickAction }) {
                 </table>
               )}
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Quick Actions */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg border border-warm-200 p-5">
-            <h3 className="font-semibold text-warm-900 mb-4">Quick Actions</h3>
+          <Card>
+            <Card.Header>
+              <h3 className="font-semibold text-warm-900">Quick Actions</h3>
+            </Card.Header>
+            <Card.Body>
 
             <div className="space-y-3">
               <QuickActionButton
@@ -307,21 +313,26 @@ export default function ICDashboard({ onQuickAction }) {
                 onClick={() => onQuickAction("Today's Deadlines")}
               />
             </div>
-          </div>
+            </Card.Body>
+          </Card>
 
           {/* PoSH Act Reminder */}
-          <div className="mt-6 bg-accent-50 border border-accent-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-accent-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <p className="text-sm font-medium text-accent-900 mb-1">90-Day Statutory Deadline</p>
-                <p className="text-xs text-accent-700">
-                  All cases must be resolved within 90 days as per PoSH Act, 2013
-                </p>
+          <div className="mt-6">
+            <Card padding="comfortable">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-accent-50 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-accent-900 mb-1">90-Day Statutory Deadline</p>
+                  <p className="text-xs text-accent-700">
+                    All cases must be resolved within 90 days as per PoSH Act, 2013
+                  </p>
+                </div>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </div>
