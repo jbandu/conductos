@@ -30,9 +30,27 @@ import pushRouter from './routes/push.js';
 import employeeRouter from './routes/employee.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { initializeDatabase } from './db/pg-init.js';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Ensure required directories exist
+const ensureDirectories = () => {
+  const directories = [
+    path.join(__dirname, 'uploads'),
+    path.join(__dirname, 'uploads/evidence'),
+    path.join(__dirname, 'uploads/temp')
+  ];
+
+  directories.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`✓ Created directory: ${dir}`);
+    }
+  });
+  console.log('✓ Directory initialization complete');
+};
 
 const app = express();
 const PORT = config.PORT;
@@ -149,6 +167,9 @@ const startServer = (port, retries = 2) => {
       }
     });
 };
+
+// Initialize directories and database, then start server
+ensureDirectories();
 
 initializeDatabase()
   .then(() => startServer(PORT))

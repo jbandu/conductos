@@ -81,7 +81,7 @@ export default function ResetPassword() {
 
       setSuccess(true);
       setTimeout(() => {
-        navigate('/login');
+        navigate('/');
       }, 3000);
     } catch (err) {
       setError(err.message);
@@ -128,7 +128,7 @@ export default function ResetPassword() {
                   Request New Reset Link
                 </Link>
                 <Link
-                  to="/login"
+                  to="/"
                   className="block w-full py-3 px-4 border border-warm-300 rounded-lg text-base font-medium text-warm-700 hover:bg-warm-50"
                 >
                   Back to Login
@@ -165,7 +165,7 @@ export default function ResetPassword() {
               </p>
 
               <Link
-                to="/login"
+                to="/"
                 className="text-primary-600 hover:text-primary-700 font-medium"
               >
                 Go to Login
@@ -258,7 +258,7 @@ export default function ResetPassword() {
 
           <div className="mt-6 text-center">
             <Link
-              to="/login"
+              to="/"
               className="text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
               ← Back to Login
