@@ -52,6 +52,10 @@ export function ChatProvider({ children }) {
   };
 
   const updateMode = (mode) => {
+    // IC members are locked to IC mode - don't allow switching to employee
+    if (isICMember && mode === 'employee') {
+      return;
+    }
     setCurrentMode(mode);
     localStorage.setItem('chatMode', mode);
   };
