@@ -6,25 +6,15 @@ on:
   pull_request:
     branches: [ main, render-deployment ]
 
-jobs:
-  test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
+env:
+  # Railway deployment URL - tests run against production
+  BASE_URL: https://conductos-server-production.up.railway.app
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: conductos_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+jobs:
+  smoke-tests:
+    name: Smoke Tests
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -42,61 +32,61 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps chromium
 
-    - name: Setup test environment
+    - name: Verify deployment is accessible
       run: |
-        # Create .env file with test configuration
-        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/conductos_test" > .env
-        echo "NODE_ENV=test" >> .env
-        echo "PORT=3001" >> .env
-        echo "JWT_SECRET=test-secret-key-for-ci" >> .env
-        echo "CLIENT_URL=http://localhost:5173" >> .env
-        echo "VITE_API_URL=http://localhost:3001" >> .env
-
-        # Copy env to client directory for Vite
-        cp .env client/.env || true
-
-        echo "Environment configured for CI"
-        cat .env
-
-    - name: Verify database connection
-      run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d conductos_test -c "SELECT 1" || exit 1
-        echo "Database connection verified"
-
-    - name: Build client for production
-      run: npm run build --workspace=client
-      env:
-        NODE_ENV: production
-
-    - name: Start client preview server
-      run: |
-        # Start the Vite preview server in background on port 5173
-        cd client && npx vite preview --port 5173 --host 0.0.0.0 &
-
-        # Wait for server to be ready (up to 60 seconds)
-        echo "Waiting for client server to start on port 5173..."
-        for i in {1..60}; do
-          if curl -s http://localhost:5173 > /dev/null 2>&1; then
-            echo "Client server is ready!"
+        echo "Checking if Railway deployment is accessible..."
+        for i in {1..5}; do
+          if curl -s -o /dev/null -w "%{http_code}" $BASE_URL | grep -q "200\|301\|302"; then
+            echo "Deployment is accessible!"
             exit 0
           fi
-          echo "Attempt $i: Server not ready yet, waiting..."
-          sleep 1
+          echo "Attempt $i: Deployment not ready, waiting 5s..."
+          sleep 5
         done
-
-        echo "ERROR: Client server failed to start within 60 seconds"
+        echo "ERROR: Deployment not accessible after 5 attempts"
         exit 1
 
-    - name: Run Playwright tests (Chromium only)
-      run: npx playwright test --project=chromium --reporter=html
+    - name: Run Smoke Tests
+      run: npx playwright test tests/smoke.spec.js --project=chromium --reporter=list
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/conductos_test
-        NODE_ENV: test
-        JWT_SECRET: test-secret-key-for-ci
         CI: true
-        PLAYWRIGHT_BROWSERS_PATH: 0
-        # Tell Playwright not to start its own server
-        PLAYWRIGHT_SKIP_WEBSERVER: true
+        TEST_BASE_URL: ${{ env.BASE_URL }}
+
+    - name: Upload Smoke Test Results
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: smoke-test-results
+        path: test-results/
+        retention-days: 7
+
+  full-tests:
+    name: Full Test Suite
+    needs: smoke-tests
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+
+    - name: Run Full Playwright Tests
+      run: npx playwright test --project=chromium --ignore-pattern="**/smoke.spec.js" --reporter=html
+      env:
+        CI: true
+        TEST_BASE_URL: ${{ env.BASE_URL }}
 
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
@@ -108,19 +98,8 @@ jobs:
 
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results
-        path: test-results/
-        retention-days: 30
-
-    - name: Upload Debug Logs
-      uses: actions/upload-artifact@v4
       if: failure()
       with:
-        name: debug-logs
-        path: |
-          .env
-          client/.env
-          test-results/
+        name: full-test-results
+        path: test-results/
         retention-days: 7
