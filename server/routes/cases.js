@@ -1,15 +1,18 @@
 import express from 'express';
 import { caseService } from '../services/caseServicePg.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// GET all cases with optional filters
-router.get('/', async (req, res) => {
+// GET all cases with optional filters (requires authentication)
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const filters = {
       status: req.query.status,
       is_overdue: req.query.is_overdue,
-      search: req.query.search
+      search: req.query.search,
+      // Add user-specific filtering
+      user: req.user
     };
     const cases = await caseService.getAllCases(filters);
     res.json(cases);
@@ -18,10 +21,34 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST create a new case
+// POST create a new case (optional auth - anonymous cases allowed)
 router.post('/', async (req, res) => {
   try {
-    const newCase = await caseService.createCase(req.body);
+    const caseData = { ...req.body };
+
+    // Try to get authenticated user info from token (if present)
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token) {
+      try {
+        const jwt = await import('jsonwebtoken');
+        const { config } = await import('../config.js');
+        const decoded = jwt.default.verify(token, config.JWT_SECRET);
+        // Set complainant_id from authenticated user
+        if (!caseData.is_anonymous) {
+          caseData.complainant_id = decoded.id;
+          // Use user's email if not provided
+          if (!caseData.complainant_email) {
+            caseData.complainant_email = decoded.email;
+          }
+        }
+      } catch (err) {
+        // Token invalid or expired, proceed without auth (for anonymous cases)
+        console.log('Optional auth failed, proceeding without user context');
+      }
+    }
+
+    const newCase = await caseService.createCase(caseData);
     res.status(201).json({
       success: true,
       case: {

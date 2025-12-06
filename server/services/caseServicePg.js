@@ -98,6 +98,19 @@ export const caseService = {
     const params = [];
     let paramIndex = 1;
 
+    // Filter by user role - employees only see their own cases
+    if (filters.user) {
+      const { role, email, id } = filters.user;
+
+      // Employees can only see their own cases
+      if (role === 'employee') {
+        query += ` AND (complainant_email = $${paramIndex} OR complainant_id = $${paramIndex + 1})`;
+        params.push(email, id);
+        paramIndex += 2;
+      }
+      // IC members and admins see all cases (no additional filter)
+    }
+
     // Filter by status
     if (filters.status) {
       query += ` AND status = $${paramIndex}`;
@@ -187,8 +200,8 @@ export const caseService = {
       INSERT INTO cases (
         case_code, status, incident_date, description, is_anonymous,
         anonymous_alias, contact_method, complainant_name, complainant_email,
-        conciliation_requested, deadline_date
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        complainant_id, conciliation_requested, deadline_date
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING id
     `;
 
@@ -202,6 +215,7 @@ export const caseService = {
       caseData.contact_method || null,
       caseData.complainant_name || null,
       caseData.complainant_email || null,
+      caseData.complainant_id || null,
       caseData.conciliation_requested || false,
       deadlineDate
     ];

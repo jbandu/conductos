@@ -213,13 +213,13 @@ router.get('/stats', async (req, res) => {
     const caseStats = await pool.query(`
       SELECT
         COUNT(*) as total_cases,
-        COUNT(*) FILTER (WHERE status = 'new') as new_cases,
-        COUNT(*) FILTER (WHERE status = 'investigating') as investigating_cases,
-        COUNT(*) FILTER (WHERE status = 'resolved') as resolved_cases,
-        COUNT(*) FILTER (WHERE status = 'closed') as closed_cases
+        COUNT(*) FILTER (WHERE c.status = 'new') as new_cases,
+        COUNT(*) FILTER (WHERE c.status = 'investigating') as investigating_cases,
+        COUNT(*) FILTER (WHERE c.status = 'resolved') as resolved_cases,
+        COUNT(*) FILTER (WHERE c.status = 'closed') as closed_cases
       FROM cases c
-      JOIN users u ON c.complainant_id = u.id
-      WHERE u.organization_id = $1
+      LEFT JOIN users u ON c.complainant_id = u.id
+      WHERE u.organization_id = $1 OR u.organization_id IS NULL
     `, [orgId]);
 
     // Get IC composition
