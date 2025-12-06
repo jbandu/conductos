@@ -244,7 +244,7 @@ export default function FileComplaint() {
     { id: 5, label: 'Review' }
   ];
 
-  // Load draft if available
+  // Load draft or prefilled data from chat
   useEffect(() => {
     if (location.state?.draft) {
       try {
@@ -256,6 +256,20 @@ export default function FileComplaint() {
       } catch (err) {
         console.error('Error loading draft:', err);
       }
+    }
+    // Handle prefilled data from chat intake flow
+    if (location.state?.prefillData) {
+      const prefill = location.state.prefillData;
+      setFormData(prev => ({
+        ...prev,
+        incidentDate: prefill.incidentDate || prev.incidentDate,
+        incidentLocation: prefill.incidentLocation || prev.incidentLocation,
+        description: prefill.description || prev.description,
+        respondentName: prefill.respondentName || prev.respondentName,
+        respondentDepartment: prefill.respondentDepartment || prev.respondentDepartment,
+        hasWitnesses: prefill.hasWitnesses || prev.hasWitnesses,
+        witnesses: prefill.witnesses?.length ? prefill.witnesses : prev.witnesses
+      }));
     }
   }, [location.state]);
 
