@@ -135,6 +135,13 @@ export function useIntakeFlow() {
       if (response.success) {
         setCaseResult(response.case);
         setStep('complete');
+
+        // Refresh sidebar cases list if the function exists
+        if (window.refreshCasesSidebar) {
+          setTimeout(() => {
+            window.refreshCasesSidebar();
+          }, 500); // Small delay to ensure database has updated
+        }
       } else {
         setError(response.error || 'Failed to submit complaint');
       }

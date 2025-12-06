@@ -29,26 +29,44 @@ router.post('/', async (req, res) => {
     // Try to get authenticated user info from token (if present)
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+
     if (token) {
       try {
         const jwt = await import('jsonwebtoken');
         const { config } = await import('../config.js');
         const decoded = jwt.default.verify(token, config.JWT_SECRET);
-        // Set complainant_id from authenticated user
+
+        console.log('Authenticated case creation by user:', decoded.email, 'ID:', decoded.id);
+
+        // ALWAYS set complainant_id for authenticated users
+        // This links the case to their account for visibility
+        caseData.complainant_id = decoded.id;
+
+        // For non-anonymous cases, also ensure email is set
         if (!caseData.is_anonymous) {
-          caseData.complainant_id = decoded.id;
-          // Use user's email if not provided
           if (!caseData.complainant_email) {
             caseData.complainant_email = decoded.email;
           }
         }
+
+        console.log('Case data after auth:', {
+          complainant_id: caseData.complainant_id,
+          complainant_email: caseData.complainant_email,
+          is_anonymous: caseData.is_anonymous
+        });
       } catch (err) {
         // Token invalid or expired, proceed without auth (for anonymous cases)
-        console.log('Optional auth failed, proceeding without user context');
+        console.error('Auth token verification failed:', err.message);
+        console.log('Proceeding with case creation without user context');
       }
+    } else {
+      console.log('No auth token provided, creating anonymous case');
     }
 
     const newCase = await caseService.createCase(caseData);
+
+    console.log('Case created successfully:', newCase.case_code, 'complainant_id:', newCase.complainant_id);
+
     res.status(201).json({
       success: true,
       case: {
@@ -60,6 +78,7 @@ router.post('/', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Case creation error:', error);
     res.status(400).json({
       success: false,
       error: error.message

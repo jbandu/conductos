@@ -51,16 +51,22 @@ export default function IntakeComplete({ caseCode, createdAt, deadlineDate, onNe
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-gray-700">
                 The Presiding Officer has been notified and will review your complaint within 7 days.
-                You can check your case status anytime by entering your case code.
+                You can check your case status anytime by entering your case code or clicking it in the sidebar.
               </p>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-3 space-y-2">
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors min-h-[44px] font-medium"
+              >
+                Back to Chat
+              </button>
               <button
                 onClick={onNewComplaint}
-                className="text-blue-600 text-sm hover:underline font-medium"
+                className="w-full px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors min-h-[44px] font-medium"
               >
-                File another complaint
+                File Another Complaint
               </button>
             </div>
           </div>

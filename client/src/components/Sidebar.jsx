@@ -18,10 +18,12 @@ export default function Sidebar() {
   }, [user, isICMember, currentMode, setCurrentMode]);
 
   useEffect(() => {
-    if (currentMode === 'ic') {
+    // Fetch cases for both IC members and employees
+    // IC members see all cases, employees see only their cases
+    if (user && (currentMode === 'ic' || currentMode === 'employee')) {
       fetchRecentCases();
     }
-  }, [currentMode]);
+  }, [currentMode, user]);
 
   const fetchRecentCases = async () => {
     try {
@@ -29,8 +31,19 @@ export default function Sidebar() {
       setRecentCases(cases.slice(0, 10));
     } catch (error) {
       console.error('Failed to fetch cases:', error);
+      setRecentCases([]); // Clear cases on error
     }
   };
+
+  // Expose fetchRecentCases globally so it can be called after case creation
+  useEffect(() => {
+    if (user) {
+      window.refreshCasesSidebar = fetchRecentCases;
+    }
+    return () => {
+      delete window.refreshCasesSidebar;
+    };
+  }, [user]);
 
   const handleNewChat = () => {
     clearMessages();
@@ -193,15 +206,38 @@ export default function Sidebar() {
           </div>
         )}
 
-        {/* Employee Mode Help */}
+        {/* Employee Mode - My Cases */}
         {currentMode === 'employee' && (
           <div className="flex-1 overflow-y-auto">
             <div className="p-4">
-              <h3 className="text-sm font-semibold text-warm-400 mb-2">Quick Actions</h3>
-              <div className="space-y-2 text-sm text-warm-500">
-                <p>• Report an incident</p>
-                <p>• Check case status</p>
-                <p>• Learn about PoSH</p>
+              <h3 className="text-sm font-semibold text-warm-400 mb-2 uppercase tracking-wide">My Cases</h3>
+              {recentCases.length === 0 ? (
+                <div className="text-sm text-warm-500 space-y-2">
+                  <p>You haven't filed any complaints yet.</p>
+                  <p className="text-xs text-warm-600">Use the chat to file a complaint or check case status.</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {recentCases.map((caseItem) => (
+                    <button
+                      key={caseItem.id}
+                      onClick={() => handleCaseClick(caseItem.case_code)}
+                      className="w-full text-left px-3 py-2 hover:bg-warm-800 rounded text-sm transition-colors min-h-[44px]"
+                    >
+                      <p className="font-medium truncate">{caseItem.case_code}</p>
+                      <p className="text-xs text-warm-400 truncate">{caseItem.status}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-6">
+                <h3 className="text-sm font-semibold text-warm-400 mb-2">Quick Actions</h3>
+                <div className="space-y-1 text-xs text-warm-500">
+                  <p>• Report an incident</p>
+                  <p>• Check case status</p>
+                  <p>• Learn about PoSH</p>
+                </div>
               </div>
             </div>
           </div>
