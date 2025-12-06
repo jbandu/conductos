@@ -92,7 +92,9 @@ export default function CaseDetail() {
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
 
   useEffect(() => {
@@ -184,12 +186,25 @@ export default function CaseDetail() {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
+    setIsUploading(true);
+    setError(null);
+    setUploadSuccess(false);
+
     try {
       await api.uploadEvidence(caseId, files, files.map(() => ''));
       await fetchEvidence();
       setActiveTab('documents');
+      setUploadSuccess(true);
+      // Hide success message after 5 seconds
+      setTimeout(() => setUploadSuccess(false), 5000);
     } catch (err) {
       setError(err.message);
+      // Scroll to top to show error
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      e.target.value = '';
     }
   };
 
@@ -256,6 +271,58 @@ export default function CaseDetail() {
           </div>
         )}
 
+        {/* Upload Success Banner */}
+        {uploadSuccess && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-semibold text-green-800">Evidence Uploaded Successfully!</p>
+                <p className="text-sm text-green-600">
+                  Your documents have been added to the case.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setUploadSuccess(false)}
+              className="text-green-600 hover:text-green-800"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-semibold text-red-800">Error</p>
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-600 hover:text-red-800"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         {/* Back Button */}
         <Link
           to="/employee/cases"
@@ -307,15 +374,28 @@ export default function CaseDetail() {
 
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-3">
-            <label className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
-              <svg className="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-              </svg>
-              Add Evidence
+            <label className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 ${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+              {isUploading ? (
+                <>
+                  <svg className="animate-spin w-5 h-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                  Add Evidence
+                </>
+              )}
               <input
                 type="file"
                 multiple
                 onChange={handleFileUpload}
+                disabled={isUploading}
                 className="hidden"
                 accept="image/*,.pdf,.doc,.docx"
               />
@@ -388,15 +468,28 @@ export default function CaseDetail() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-gray-900">Documents & Evidence</h3>
-                  <label className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 cursor-pointer">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Upload File
+                  <label className={`inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 ${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                    {isUploading ? (
+                      <>
+                        <svg className="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Upload File
+                      </>
+                    )}
                     <input
                       type="file"
                       multiple
                       onChange={handleFileUpload}
+                      disabled={isUploading}
                       className="hidden"
                       accept="image/*,.pdf,.doc,.docx"
                     />
