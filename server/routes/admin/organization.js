@@ -226,10 +226,10 @@ router.get('/stats', async (req, res) => {
     const icStats = await pool.query(`
       SELECT
         COUNT(*) as total_members,
-        COUNT(*) FILTER (WHERE is_active = true) as active_members,
-        COUNT(*) FILTER (WHERE role = 'presiding_officer' AND is_active = true) as presiding_officers,
-        COUNT(*) FILTER (WHERE role = 'internal_member' AND is_active = true) as internal_members,
-        COUNT(*) FILTER (WHERE role = 'external_member' AND is_active = true) as external_members
+        COUNT(*) FILTER (WHERE icm.is_active = true) as active_members,
+        COUNT(*) FILTER (WHERE icm.role = 'presiding_officer' AND icm.is_active = true) as presiding_officers,
+        COUNT(*) FILTER (WHERE icm.role = 'internal_member' AND icm.is_active = true) as internal_members,
+        COUNT(*) FILTER (WHERE icm.role = 'external_member' AND icm.is_active = true) as external_members
       FROM ic_members icm
       JOIN users u ON icm.user_id = u.id
       WHERE u.organization_id = $1
