@@ -51,13 +51,6 @@ export default function Sidebar() {
     setSidebarOpen(false);
   };
 
-  const handleModeChange = () => {
-    const newMode = currentMode === 'employee' ? 'ic' : 'employee';
-    setCurrentMode(newMode);
-    clearMessages();
-    navigate('/chat');
-  };
-
   const handleCaseClick = async (caseCode) => {
     setSidebarOpen(false);
     setCurrentMode('ic');
@@ -113,33 +106,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Mode Toggle - Only show for IC members */}
-        {isICMember && (
-          <div className="px-4 pb-4 border-b border-warm-800">
-            <div className="bg-warm-800 rounded-lg p-1 flex">
-              <button
-                onClick={handleModeChange}
-                className={`flex-1 px-3 py-2 rounded text-sm transition-colors min-h-[44px] ${
-                  currentMode === 'employee'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-warm-400 hover:text-white'
-                }`}
-              >
-                Employee
-              </button>
-              <button
-                onClick={handleModeChange}
-                className={`flex-1 px-3 py-2 rounded text-sm transition-colors min-h-[44px] ${
-                  currentMode === 'ic'
-                    ? 'bg-accent-600 text-white'
-                    : 'text-warm-400 hover:text-white'
-                }`}
-              >
-                IC Mode
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Mode Toggle removed for IC members - they always use IC mode */}
 
         {/* IC Mode Navigation */}
         {currentMode === 'ic' && (
@@ -206,8 +173,8 @@ export default function Sidebar() {
           </div>
         )}
 
-        {/* Employee Mode - My Cases */}
-        {currentMode === 'employee' && (
+        {/* Employee Mode - My Cases (only for non-IC members) */}
+        {currentMode === 'employee' && !isICMember && (
           <div className="flex-1 overflow-y-auto">
             <div className="p-4">
               <h3 className="text-sm font-semibold text-warm-400 mb-2 uppercase tracking-wide">My Cases</h3>
