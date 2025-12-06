@@ -5,7 +5,7 @@ It provides a safe, guided experience for employees, robust workflows for Intern
 
 ---
 
-# 🚀 Tech Stack
+## 🚀 Tech Stack
 
 | Layer | Technology |
 |-------|------------|
@@ -14,116 +14,122 @@ It provides a safe, guided experience for employees, robust workflows for Intern
 | Database | PostgreSQL (Railway, Render, Local) |
 | AI Layer | OpenAI + Anthropic + Multi-Agent Orchestrator |
 | Knowledge Layer | PoSH MCP Knowledge Server |
-| Testing | Playwright (E2E, mobile + desktop) |
+| Testing | Playwright |
 | Deployment | Railway + Render + Local Ubuntu |
 | Architecture | Monorepo (client + server workspaces) |
 
 ---
 
-# 📁 Project Structure
+## 📁 Project Structure
 
+```txt
 conductos/
-├── client/ # React 18 + Vite frontend
-│ ├── src/
-│ │ ├── components/ # UI components
-│ │ ├── pages/ # Employee & IC screens
-│ │ ├── services/ # API calls
-│ │ ├── design-system/ # Shared UI patterns
-│ │ └── App.jsx
-│ └── package.json
+  client/                         # React 18 + Vite frontend
+    src/
+      components/                 # Shared UI components
+      pages/                      # Employee & IC pages
+      services/                   # API wrapper functions
+      design-system/              # Shared UI primitives + styling patterns
+      App.jsx
+    index.html
+    package.json
 
-├── server/ # Node/Express backend
-│ ├── index.js # App bootstrap
-│ ├── config.js # Env + config loader
-│ ├── routes/ # REST API routes
-│ ├── services/ # Business logic
-│ ├── middleware/ # Auth, logging, errors
-│ ├── db/
-│ │ ├── pg-init.js # Postgres pool + init
-│ │ ├── schema.sql # DB schema reference
-│ │ └── utils.js # Case code generator etc.
-│ ├── jobs/ # AI insight scheduler
-│ └── package.json
+  server/                         # Node.js / Express backend
+    index.js                      # App bootstrap entrypoint
+    config.js                     # Environment variable + config loader
+    routes/                       # REST API routes
+    services/                     # Business logic (cases, user mgmt, AI, etc.)
+    middleware/                   # Auth, logging, error handling
+    db/
+      pg-init.js                  # Postgres connection pool + init
+      schema.sql                  # Database schema reference
+      utils.js                    # Case code generator + helpers
+    jobs/                         # Scheduled background tasks (e.g., AI insights)
+    package.json
 
-├── posh-knowledge-mcp/ # MCP Knowledge Server: Act, Rules, Case Law
-│ ├── src/
-│ └── package.json
+  posh-knowledge-mcp/             # MCP Server: PoSH Act, rules, case law, templates
+    src/
+    package.json
 
-├── tests/ # Playwright test suite
-│ ├── employee/
-│ ├── ic/
-│ ├── cases/
-│ └── intake/
-│
-├── docs/ & guides:
-│ ├── LOCAL_LAUNCH_GUIDE.md
-│ ├── API_DOCUMENTATION.md
-│ ├── RAILWAY_DEPLOYMENT_GUIDE.md
-│ ├── RENDER_DEPLOYMENT_GUIDE.md
-│ ├── TEST_PLAN.md
-│ ├── DESIGN_SYSTEM.md
-│ ├── PILOT_USER_GUIDE.md
-│ └── CONDUCTOS_TESTING_VALIDATION_GUIDE.md
-│
-├── railway.toml # Railway deployment config
-├── render.yaml # Render deployment blueprint
-├── playwright.config.js # Test config
-├── .env.example # Example environment
-└── package.json # Monorepo root
+  tests/                          # Playwright test suite
+    employee/
+    ic/
+    cases/
+    intake/
+    mobile/
+    test-utils.js
 
-markdown
-Copy code
+  docs/                           # Documentation & guides
+    API_DOCUMENTATION.md
+    LOCAL_LAUNCH_GUIDE.md
+    RAILWAY_DEPLOYMENT_GUIDE.md
+    RENDER_DEPLOYMENT_GUIDE.md
+    TEST_PLAN.md
+    DESIGN_SYSTEM.md
+    PILOT_USER_GUIDE.md
+    CONDUCTOS_TESTING_VALIDATION_GUIDE.md
+
+  railway.toml                    # Railway deployment config
+  render.yaml                     # Render deployment blueprint
+  playwright.config.js            # Playwright config
+  .env.example                    # Example environment template
+  package.json                    # Monorepo root (workspaces)
+```
 
 ---
 
-# 🧠 Core System Capabilities
+## 🧠 Core System Capabilities
 
-## 🔹 1. Case Management
-- Create, update, and manage PoSH cases
-- Automatic case code generation (`KELP-YYYY-NNNN`)
-- Full lifecycle support:
-  - New → Under Review → Conciliation → Investigation → Decision Pending → Closed
-- Status history & immutable audit trail
-- Deadline management (90-day PoSH timelines)
+### 🔹 1. Case Management
+- Create, update, track, and close PoSH cases  
+- Automatic case code generation (`KELP-YYYY-NNNN`)  
+- Full workflow lifecycle  
+- Status history + immutable audit log  
+- Deadline management (90-day PoSH compliance timeline)
 
-## 🔹 2. Employee Experience
-- Guided case submission (anonymous or identified)
-- Psychological safety oriented UI
-- Track your case status
-- Educational content + policy awareness
+### 🔹 2. Employee Experience
+- Guided case submission (anonymous or identified)  
+- Psychological-safety-focused UI  
+- Real-time case status tracking  
+- Educational PoSH content  
 
-## 🔹 3. Internal Committee (IC) Experience
-- Case dashboards by urgency, deadline, status
-- Role-based access control (RBAC)
-- Investigation tools and document flows
-- AI-assisted reasoning, summaries, and pattern detection
+### 🔹 3. Internal Committee (IC) Experience
+- Dashboard of open, overdue, and new cases  
+- Investigations workflow  
+- Role-based access control (RBAC)  
+- IC-only tools for documents, notes, and status changes
 
-## 🔹 4. AI & Automation
-- `/api/chat` — conversational guidance using OpenAI/Anthropic
-- Multi-Agent Orchestrator:
-  - Policy lookup agent
-  - IC assistant agent
-  - Sentiment analysis agent
-  - Pattern-detection agent
-- MCP Knowledge Server:
-  - Full PoSH Act text
-  - Rules
-  - Case law summaries
-  - Templates and checklists
+### 🔹 4. AI & Automation
+- `/api/chat` conversational guidance using OpenAI/Anthropic  
+- Multi-Agent Orchestrator:  
+  - Policy agent  
+  - IC assistant agent  
+  - Sentiment agent  
+  - Pattern detection agent  
+- PoSH Knowledge MCP Server:  
+  - PoSH Act  
+  - PoSH Rules  
+  - Case law summaries  
+  - Templates  
 
-## 🔹 5. Security & Compliance
+### 🔹 5. Security & Compliance
 - JWT authentication  
-- Roles: `employee`, `ic_member`, `hr_admin`, `super_admin`
-- Organization-scoped data access (multi-tenant ready)
-- bcrypt password hashing, resets, lockout
-- Strict validation on all inputs
-- No sensitive info stored in logs
+- Roles: `employee`, `ic_member`, `hr_admin`, `super_admin`  
+- Organization-scoped access (multi-tenant)  
+- Password policies, reset flows, lockout  
+- No sensitive data logged  
 
 ---
 
-# ⚙️ Environment Variables
+## ⚙️ Environment Variables
 
-Create a `.env` file based on `.env.example`:
+Copy `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Then set:
 
 ```env
 PORT=3001
@@ -133,219 +139,140 @@ DATABASE_URL=postgresql://localhost:5432/conductos
 JWT_SECRET=your-secret
 JWT_EXPIRES_IN=7d
 
-OPENAI_API_KEY=your-key
-ANTHROPIC_API_KEY=your-key
+OPENAI_API_KEY=your-openai-key
+ANTHROPIC_API_KEY=your-anthropic-key
 
-RESEND_API_KEY=your-resend-key
+RESEND_API_KEY=your-resend-api-key
 FROM_EMAIL=noreply@conductos.app
-For production, see:
+```
 
-RAILWAY_ENV_VARS.md
+---
 
-RENDER_DEPLOYMENT_GUIDE.md
+## 🛠 Local Development (Ubuntu, macOS, Windows)
 
-🛠 Local Development (Ubuntu, macOS, Windows)
-1. Install dependencies
-bash
-Copy code
+### 1. Install dependencies
+
+```bash
 npm install
-2. Setup database
-bash
-Copy code
-# Create schema in Postgres
+```
+
+### 2. Initialize database
+
+```bash
 npm run db:init
+```
 
-# Optional demo users + sample cases
+### 3. Optional: Seed demo data
+
+```bash
 npm run seed:demo
-3. Start development servers
-bash
-Copy code
+```
+
+### 4. Start dev servers
+
+```bash
 npm run dev
-Backend → http://localhost:3001
+```
 
-Frontend → http://localhost:5173
+- Backend → http://localhost:3001  
+- Frontend → http://localhost:5173  
 
-Health Check:
+---
 
-bash
-Copy code
-GET http://localhost:3001/api/health
-🌐 Deployment Guide
-🚉 Railway Deployment
-railway.toml config included
+## 🌐 Deployment
 
-Railway auto-injects DATABASE_URL
+### 🚉 Railway Deployment
 
-Commands:
-
-bash
-Copy code
-# Build frontend for production
+```bash
 npm run railway:build
-
-# Start backend + serve client
 npm run railway:start
-See RAILWAY_DEPLOYMENT_GUIDE.md.
+```
 
-🟦 Render Deployment
-Render uses the render-deployment branch + blueprint defined in:
+Documentation:  
+See `RAILWAY_DEPLOYMENT_GUIDE.md`.
 
-Copy code
-render.yaml
-See RENDER_DEPLOYMENT_GUIDE.md for:
+---
 
-service creation
+### 🟦 Render Deployment
 
-environment variables
+Render uses:
 
-logging & monitoring
+- `render.yaml`
+- Branch: `render-deployment`
 
-multi-environment setup
+Documentation:  
+See `RENDER_DEPLOYMENT_GUIDE.md`.
 
-🧪 Testing
-Playwright E2E tests cover:
+---
 
-Employee flows
+## 🧪 Testing (Playwright)
 
-IC flows
+Run full suite:
 
-Intake & submission
-
-Authentication
-
-Case lifecycle
-
-Mobile view tests
-
-Run full test suite:
-
-bash
-Copy code
+```bash
 npm test
-Focus runs:
+```
 
-bash
-Copy code
+Open UI mode:
+
+```bash
 npm run test:ui
+```
+
+Targeted test runs:
+
+```bash
 npm run test:employee
 npm run test:ic
 npm run test:cases
 npm run test:intake
 npm run test:mobile
-npm run test:report
-See:
+```
 
-TEST_PLAN.md
+---
 
-MANUAL_TEST_SCRIPT.md
+## 🎨 Design System
 
-CONDUCTOS_TESTING_VALIDATION_GUIDE.md
+Principles:
 
-🎨 Design System
-ConductOS follows trauma-informed UI principles:
+- Trauma-informed UI  
+- Accessibility-first  
+- Clear, guided workflows  
+- Tailwind CSS conventions  
 
-Empathy-first messaging
+See `DESIGN_SYSTEM.md` for full design tokens & patterns.
 
-High contrast for accessibility
+---
 
-Simple, forgiving flows
+## 🔮 Roadmap
 
-Consistent components & spacing
+### Upcoming Enhancements
+- Multilingual foundation  
+- Repository pattern for database access  
+- Centralized Zod validation  
+- Global error middleware + structured logging  
 
-Tailwind utility conventions
+### Future Plans
+- Metrics dashboards  
+- Organization onboarding wizard  
+- Multilingual UI + email templates  
+- AI-assisted IC report creation  
+- Optional Next.js migration  
 
-See DESIGN_SYSTEM.md for:
+---
 
-Tokens
+## 🤝 Contributing
 
-Spacing
+1. Create a feature branch  
+2. Add tests when applicable  
+3. Follow design-system conventions  
+4. Update relevant documentation  
+5. Run `npm test` before PR submission  
 
-Typography
+---
 
-Component primitives
+## 🛡 License
 
-🧩 Architecture Overview
-Frontend
-React + Vite
-
-Client-side routing
-
-Centralized API client
-
-Design-system driven UI
-
-Future-ready for multilingual expansion (react-i18next compatible)
-
-Backend
-Modular Express API
-
-Services layer decoupled from routes
-
-Repository-style Postgres access
-
-Strong input validation (moving toward Zod)
-
-AI orchestrator endpoints
-
-MCP server for PoSH knowledge artifacts
-
-Database (Postgres)
-cases
-
-status_history
-
-users
-
-organizations
-
-audit_log
-
-ic_members
-
-resend_email_log
-
-🔮 Roadmap
-Immediate
-Add multilingual foundation (i18n keys, translation extraction)
-
-Centralize validation with Zod
-
-Add repository pattern for DB access
-
-Add global error middleware + structured logging
-
-Medium Term
-Expand PoSH MCP server with more tools
-
-Improve insights + agent orchestration
-
-Add organization onboarding wizard
-
-Add metrics dashboard (case volume, SLA breaches)
-
-Long Term
-Full multilingual UI (English, Hindi, Tamil, Telugu)
-
-Server-side notifications per language
-
-Move to Next.js 15 app router architecture (optional)
-
-AI-assisted IC report drafting
-
-Auto-classification of case types
-
-🤝 Contributing
-Create a feature branch from main or render-deployment
-
-Add tests where applicable
-
-Follow the design system for UI changes
-
-Document new endpoints in API_DOCUMENTATION.md
-
-Run npm test before pushing
-
-🛡 License
 Private / Proprietary — Not for public distribution.
 
-ConductOS is designed to create safer workplaces with compassion, structure, and intelligence.
+ConductOS is built to create safer workplaces with compassion, structure, and intelligence.
