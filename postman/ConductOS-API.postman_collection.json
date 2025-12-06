@@ -1,0 +1,702 @@
+{
+  "info": {
+    "name": "ConductOS API",
+    "description": "Complete API collection for ConductOS - POSH Compliance Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{base_url}}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Employee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('auth_token', jsonData.token);",
+                  "    pm.environment.set('user_id', jsonData.user.id);",
+                  "    pm.environment.set('user_email', jsonData.user.email);",
+                  "    pm.environment.set('user_role', jsonData.user.role);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"employee@demo.kelphr.com\",\n  \"password\": \"password123\",\n  \"role\": \"employee\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as an employee user"
+          }
+        },
+        {
+          "name": "Login - IC Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('auth_token', jsonData.token);",
+                  "    pm.environment.set('user_id', jsonData.user.id);",
+                  "    pm.environment.set('user_email', jsonData.user.email);",
+                  "    pm.environment.set('user_role', jsonData.user.role);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"priya.sharma@demo.kelphr.com\",\n  \"password\": \"password123\",\n  \"role\": \"ic_member\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as IC member - Presiding Officer"
+          }
+        },
+        {
+          "name": "Login - Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('auth_token', jsonData.token);",
+                  "    pm.environment.set('user_id', jsonData.user.id);",
+                  "    pm.environment.set('user_email', jsonData.user.email);",
+                  "    pm.environment.set('user_role', jsonData.user.role);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo.kelphr.com\",\n  \"password\": \"Admin@123456\",\n  \"role\": \"hr_admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as super admin"
+          }
+        },
+        {
+          "name": "Signup - Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test Employee\",\n  \"email\": \"test.employee@demo.kelphr.com\",\n  \"password\": \"TestPassword123\",\n  \"role\": \"employee\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "signup"]
+            },
+            "description": "Create a new employee account"
+          }
+        }
+      ],
+      "description": "Authentication endpoints for login and signup"
+    },
+    {
+      "name": "Cases Management",
+      "item": [
+        {
+          "name": "Get All Cases (Role-Based)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases"]
+            },
+            "description": "Get all cases. Employees see only their cases, IC members see all."
+          }
+        },
+        {
+          "name": "Get Cases - Filter by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cases?status=new",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "new",
+                  "description": "Status: new, under_review, conciliation, investigating, decision_pending, closed"
+                }
+              ]
+            },
+            "description": "Filter cases by status"
+          }
+        },
+        {
+          "name": "Get Cases - Overdue Only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cases?is_overdue=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases"],
+              "query": [
+                {
+                  "key": "is_overdue",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Get only overdue cases (past 90-day deadline)"
+          }
+        },
+        {
+          "name": "Get Cases - Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cases?search=harassment",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "harassment",
+                  "description": "Search in case_code or description"
+                }
+              ]
+            },
+            "description": "Search cases by keyword"
+          }
+        },
+        {
+          "name": "Get Single Case by Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cases/KELP-2025-0001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases", "KELP-2025-0001"]
+            },
+            "description": "Get detailed case information including status history"
+          }
+        },
+        {
+          "name": "Create Case - Authenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('last_case_code', jsonData.case.case_code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"incident_date\": \"2025-11-15\",\n  \"description\": \"This is a test case with a detailed description that meets the minimum 50 character requirement for case creation. The incident involved inappropriate comments during a team meeting.\",\n  \"is_anonymous\": false,\n  \"complainant_name\": \"Test User\",\n  \"complainant_email\": \"test@example.com\",\n  \"conciliation_requested\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases"]
+            },
+            "description": "Create a new case with authentication - complainant_id will be auto-set"
+          }
+        },
+        {
+          "name": "Create Case - Anonymous",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"incident_date\": \"2025-11-20\",\n  \"description\": \"This is an anonymous complaint with sufficient details to meet the minimum character requirement. The incident occurred in the workplace and requires immediate attention from the Internal Committee.\",\n  \"is_anonymous\": true,\n  \"anonymous_alias\": \"Concerned Employee\",\n  \"contact_method\": \"Phone: +91-9876543210 (available 6-8 PM)\",\n  \"conciliation_requested\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases"]
+            },
+            "description": "Create an anonymous case without authentication"
+          }
+        },
+        {
+          "name": "Update Case Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"investigating\",\n  \"notes\": \"IC has initiated investigation. Evidence collection phase.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cases/{{last_case_code}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases", "{{last_case_code}}", "status"]
+            },
+            "description": "Update case status with notes"
+          }
+        },
+        {
+          "name": "Get Case History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cases/{{last_case_code}}/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cases", "{{last_case_code}}", "history"]
+            },
+            "description": "Get complete status change history for a case"
+          }
+        }
+      ],
+      "description": "Case management endpoints - create, read, update cases"
+    },
+    {
+      "name": "IC Features",
+      "item": [
+        {
+          "name": "Knowledge Base",
+          "item": [
+            {
+              "name": "Get All Documents",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/documents",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "documents"]
+                },
+                "description": "Get all documents from knowledge base (legal docs, playbooks, templates)"
+              }
+            },
+            {
+              "name": "Search Documents",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/documents/search?q=posh",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "documents", "search"],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "posh",
+                      "description": "Search query"
+                    }
+                  ]
+                },
+                "description": "Search documents by keyword"
+              }
+            },
+            {
+              "name": "Generate MoM",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"caseCode\": \"{{last_case_code}}\",\n  \"sessionData\": {\n    \"date\": \"2025-12-05\",\n    \"attendees\": [\"IC Member 1\", \"IC Member 2\"],\n    \"agenda\": \"Review case evidence\",\n    \"discussions\": \"Discussed witness statements and evidence.\",\n    \"decisions\": \"Proceed to next phase of investigation.\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/documents/generate/mom",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "documents", "generate", "mom"]
+                },
+                "description": "Generate Minutes of Meeting document"
+              }
+            },
+            {
+              "name": "Generate Notice to Respondent",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"caseCode\": \"{{last_case_code}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/documents/generate/notice",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "documents", "generate", "notice"]
+                },
+                "description": "Generate notice to respondent document"
+              }
+            }
+          ],
+          "description": "Knowledge base management and document generation"
+        },
+        {
+          "name": "Pattern Analysis",
+          "item": [
+            {
+              "name": "Get All Patterns",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/patterns",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "patterns"]
+                },
+                "description": "Get identified patterns across cases"
+              }
+            }
+          ],
+          "description": "Pattern analysis for identifying trends"
+        },
+        {
+          "name": "Proactive Insights",
+          "item": [
+            {
+              "name": "Get All Insights",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/insights",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "insights"]
+                },
+                "description": "Get proactive insights and recommendations"
+              }
+            },
+            {
+              "name": "Update Insight (Acknowledge)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"acknowledged\",\n  \"acknowledged_by\": {{user_id}}\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/insights/INSIGHT_ID",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "insights", "INSIGHT_ID"]
+                },
+                "description": "Acknowledge an insight"
+              }
+            }
+          ],
+          "description": "Proactive insights management"
+        }
+      ],
+      "description": "IC member exclusive features"
+    },
+    {
+      "name": "Dashboard & Stats",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "stats"]
+            },
+            "description": "Get dashboard statistics (total cases, status breakdown, etc.)"
+          }
+        }
+      ],
+      "description": "Dashboard statistics and metrics"
+    },
+    {
+      "name": "Copilot / Chat",
+      "item": [
+        {
+          "name": "Send Chat Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Show me all pending cases\",\n  \"caseCode\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/copilot/chat",
+              "host": ["{{base_url}}"],
+              "path": ["api", "copilot", "chat"]
+            },
+            "description": "Send a message to the IC Copilot"
+          }
+        },
+        {
+          "name": "Chat About Specific Case",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What's the status of this case?\",\n  \"caseCode\": \"{{last_case_code}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/copilot/chat",
+              "host": ["{{base_url}}"],
+              "path": ["api", "copilot", "chat"]
+            },
+            "description": "Chat with context of a specific case"
+          }
+        }
+      ],
+      "description": "AI-powered copilot chat interface"
+    },
+    {
+      "name": "Admin Panel",
+      "item": [
+        {
+          "name": "Get Organization Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/organization/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "organization", "stats"]
+            },
+            "description": "Get organization-wide statistics (requires admin role)"
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "users"]
+            },
+            "description": "Get all users (requires admin role)"
+          }
+        },
+        {
+          "name": "Get IC Composition",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/ic-composition",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "ic-composition"]
+            },
+            "description": "Get IC committee composition"
+          }
+        },
+        {
+          "name": "Get Audit Log",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/audit-log",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "audit-log"]
+            },
+            "description": "Get admin action audit log"
+          }
+        }
+      ],
+      "description": "Admin panel endpoints (requires hr_admin role)"
+    }
+  ]
+}
