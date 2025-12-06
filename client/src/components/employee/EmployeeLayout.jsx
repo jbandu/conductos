@@ -11,7 +11,7 @@ export default function EmployeeLayout({ children }) {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   const navigation = [

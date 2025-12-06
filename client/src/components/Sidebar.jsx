@@ -61,7 +61,7 @@ export default function Sidebar() {
   const handleLogout = () => {
     logout();
     clearMessages();
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   return (
