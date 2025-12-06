@@ -26,7 +26,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
   if (requiredRole && !hasRole(requiredRole)) {
     // Redirect to appropriate dashboard based on user's role
     if (user?.role === 'employee') {
-      return <Navigate to="/chat" replace />;
+      return <Navigate to="/employee/dashboard" replace />;
     } else if (user?.role === 'ic_member') {
       return <Navigate to="/chat" replace />;
     } else if (user?.role === 'hr_admin') {

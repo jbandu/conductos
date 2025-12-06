@@ -27,6 +27,7 @@ import interviewsRouter from './routes/interviews.js';
 import externalMemberRouter from './routes/externalMember.js';
 import monitoringRouter from './routes/monitoring.js';
 import pushRouter from './routes/push.js';
+import employeeRouter from './routes/employee.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { initializeDatabase } from './db/pg-init.js';
 
@@ -73,6 +74,7 @@ app.use('/api/interviews', interviewsRouter);
 app.use('/api/external', externalMemberRouter);
 app.use('/api/monitoring', monitoringRouter);
 app.use('/api/push', pushRouter);
+app.use('/api/employee', employeeRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -25,6 +25,12 @@ import PatternAnalysis from './pages/ic/PatternAnalysis';
 import ProactiveInsights from './pages/ic/ProactiveInsights';
 import ExternalMembers from './pages/admin/ExternalMembers';
 import MonitoringDashboard from './pages/admin/MonitoringDashboard';
+import EmployeeDashboard from './pages/employee/EmployeeDashboard';
+import FileComplaint from './pages/employee/FileComplaint';
+import MyCases from './pages/employee/MyCases';
+import CaseDetail from './pages/employee/CaseDetail';
+import AnonymousReport from './pages/employee/AnonymousReport';
+import Resources from './pages/employee/Resources';
 
 function App() {
   return (
@@ -58,6 +64,35 @@ function App() {
               <ProfilePage />
             </ProtectedRoute>
           } />
+
+          {/* Employee Portal */}
+          <Route path="/employee/dashboard" element={
+            <ProtectedRoute requiredRole="employee">
+              <EmployeeDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/employee/file-complaint" element={
+            <ProtectedRoute requiredRole="employee">
+              <FileComplaint />
+            </ProtectedRoute>
+          } />
+          <Route path="/employee/cases" element={
+            <ProtectedRoute requiredRole="employee">
+              <MyCases />
+            </ProtectedRoute>
+          } />
+          <Route path="/employee/cases/:caseId" element={
+            <ProtectedRoute requiredRole="employee">
+              <CaseDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="/employee/resources" element={
+            <ProtectedRoute requiredRole="employee">
+              <Resources />
+            </ProtectedRoute>
+          } />
+          {/* Anonymous report is public - no auth required */}
+          <Route path="/employee/anonymous-report" element={<AnonymousReport />} />
 
           {/* Admin Panel */}
           <Route path="/admin/dashboard" element={
