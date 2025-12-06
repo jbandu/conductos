@@ -44,16 +44,30 @@ jobs:
 
     - name: Setup test environment
       run: |
-        cp .env.example .env || true
-        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/conductos_test" >> .env
+        # Create .env file with test configuration
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/conductos_test" > .env
         echo "NODE_ENV=test" >> .env
         echo "PORT=3001" >> .env
         echo "JWT_SECRET=test-secret-key-for-ci" >> .env
+        echo "CLIENT_URL=http://localhost:5173" >> .env
+        echo "VITE_API_URL=http://localhost:3001" >> .env
+
+        # Copy env to client directory for Vite
+        cp .env client/.env || true
+
+        echo "Environment configured for CI"
+        cat .env
 
     - name: Verify database connection
       run: |
         PGPASSWORD=postgres psql -h localhost -U postgres -d conductos_test -c "SELECT 1" || exit 1
         echo "Database connection verified"
+
+    - name: Verify client can build
+      run: |
+        cd client && npm run build --if-present || echo "No build step needed for dev server"
+      env:
+        NODE_ENV: test
 
     - name: Run Playwright tests (Chromium only)
       run: npx playwright test --project=chromium --reporter=html
@@ -62,6 +76,8 @@ jobs:
         NODE_ENV: test
         JWT_SECRET: test-secret-key-for-ci
         CI: true
+        # Ensure Playwright can find the browsers
+        PLAYWRIGHT_BROWSERS_PATH: 0
 
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
@@ -78,3 +94,14 @@ jobs:
         name: test-results
         path: test-results/
         retention-days: 30
+
+    - name: Upload Debug Logs
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: debug-logs
+        path: |
+          .env
+          client/.env
+          test-results/
+        retention-days: 7

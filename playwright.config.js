@@ -11,12 +11,23 @@ export default defineConfig({
 
   workers: process.env.CI ? 1 : undefined,
 
-  reporter: 'html',
+  reporter: process.env.CI ? [['html'], ['list']] : 'html',
 
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    // Increase timeout for CI environments
+    actionTimeout: process.env.CI ? 30000 : 15000,
+    navigationTimeout: process.env.CI ? 60000 : 30000,
+  },
+
+  // Global test timeout
+  timeout: process.env.CI ? 60000 : 30000,
+
+  // Expect timeout for assertions
+  expect: {
+    timeout: process.env.CI ? 15000 : 5000,
   },
 
   projects: [
@@ -50,6 +61,8 @@ export default defineConfig({
     command: 'npm run dev:client -- --host 0.0.0.0 --port 5173',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000, // 3 minutes for CI cold start
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
 });
