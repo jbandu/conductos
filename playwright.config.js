@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// In CI, the workflow starts the server separately, so skip webServer
-const skipWebServer = process.env.PLAYWRIGHT_SKIP_WEBSERVER === 'true';
+// Use Railway URL in CI, localhost for local development
+const baseURL = process.env.TEST_BASE_URL || 'http://localhost:5173';
+
+// Only start local webServer if not testing against remote URL
+const useLocalServer = !process.env.TEST_BASE_URL;
 
 export default defineConfig({
   testDir: './tests',
@@ -17,10 +20,10 @@ export default defineConfig({
   reporter: process.env.CI ? [['html'], ['list']] : 'html',
 
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    // Increase timeout for CI environments
+    // Increase timeout for CI/remote environments
     actionTimeout: process.env.CI ? 30000 : 15000,
     navigationTimeout: process.env.CI ? 60000 : 30000,
   },
@@ -60,15 +63,15 @@ export default defineConfig({
     },
   ],
 
-  // Only configure webServer if not skipped (CI starts server separately)
-  ...(skipWebServer ? {} : {
+  // Only configure webServer for local development
+  ...(useLocalServer ? {
     webServer: {
       command: 'npm run dev:client -- --host 0.0.0.0 --port 5173',
       url: 'http://localhost:5173',
-      reuseExistingServer: !process.env.CI,
-      timeout: 180000, // 3 minutes for CI cold start
+      reuseExistingServer: true,
+      timeout: 180000,
       stdout: 'pipe',
       stderr: 'pipe',
     },
-  }),
+  } : {}),
 });
