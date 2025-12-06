@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// In CI, the workflow starts the server separately, so skip webServer
+const skipWebServer = process.env.PLAYWRIGHT_SKIP_WEBSERVER === 'true';
+
 export default defineConfig({
   testDir: './tests',
 
@@ -57,12 +60,15 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'npm run dev:client -- --host 0.0.0.0 --port 5173',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180000, // 3 minutes for CI cold start
-    stdout: 'pipe',
-    stderr: 'pipe',
-  },
+  // Only configure webServer if not skipped (CI starts server separately)
+  ...(skipWebServer ? {} : {
+    webServer: {
+      command: 'npm run dev:client -- --host 0.0.0.0 --port 5173',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 180000, // 3 minutes for CI cold start
+      stdout: 'pipe',
+      stderr: 'pipe',
+    },
+  }),
 });
