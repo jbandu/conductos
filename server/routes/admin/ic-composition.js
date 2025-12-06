@@ -112,7 +112,7 @@ router.post('/', async (req, res) => {
 
     // Check if user exists and has ic_member role
     const userCheck = await client.query(
-      'SELECT id, full_name, email, role FROM users WHERE id = $1 AND is_active = true',
+      'SELECT id, full_name, email, role, organization_id FROM users WHERE id = $1 AND is_active = true',
       [user_id]
     );
 
@@ -120,9 +120,17 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ error: 'User not found or inactive' });
     }
 
-    if (userCheck.rows[0].role !== 'ic_member') {
+    const user = userCheck.rows[0];
+
+    if (user.role !== 'ic_member') {
       return res.status(400).json({
         error: 'User must have ic_member role to be added to IC composition'
+      });
+    }
+
+    if (!user.organization_id) {
+      return res.status(400).json({
+        error: 'User must belong to an organization to be added to IC composition'
       });
     }
 
@@ -155,15 +163,16 @@ router.post('/', async (req, res) => {
     // Add IC member
     const result = await client.query(`
       INSERT INTO ic_members (
+        organization_id,
         user_id,
         role,
         appointed_date,
         term_end_date,
         is_active,
         created_at
-      ) VALUES ($1, $2, $3, $4, true, NOW())
+      ) VALUES ($1, $2, $3, $4, $5, true, NOW())
       RETURNING *
-    `, [user_id, role, appointed_date, term_end_date || null]);
+    `, [user.organization_id, user_id, role, appointed_date, term_end_date || null]);
 
     const newMember = result.rows[0];
 
