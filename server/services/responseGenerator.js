@@ -67,7 +67,7 @@ async function handleCaseList(mode, user) {
 
     // Employees can only see their own cases
     if (mode === 'employee' && user) {
-      cases = await caseService.getCasesByEmail(user.email);
+      cases = await caseService.getCasesByEmail(user.email, user.id);
     } else {
       // IC members see all cases
       cases = await caseService.getAllCases();

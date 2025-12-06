@@ -137,20 +137,20 @@ export const caseService = {
   },
 
   /**
-   * Get cases by complainant email
+   * Get cases by complainant email or user ID
    * Used for employees to view their own cases
    */
-  async getCasesByEmail(email) {
+  async getCasesByEmail(email, userId = null) {
     const query = `
       SELECT *,
         (deadline_date - CURRENT_DATE) as days_remaining,
         (deadline_date < CURRENT_DATE) as is_overdue
       FROM cases
-      WHERE complainant_email = $1
+      WHERE complainant_email = $1 OR complainant_id = $2
       ORDER BY created_at DESC
     `;
 
-    const result = await pool.query(query, [email]);
+    const result = await pool.query(query, [email, userId]);
     return result.rows;
   },
 
