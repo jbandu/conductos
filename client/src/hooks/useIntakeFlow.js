@@ -15,7 +15,7 @@ const STEPS = [
 export function useIntakeFlow() {
   const [step, setStep] = useState('pre_intake');
   const [data, setData] = useState({
-    incident_date: '',
+    incident_date: new Date().toISOString().split('T')[0], // Default to today
     description: '',
     conciliation_requested: null,
     is_anonymous: null,
