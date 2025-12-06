@@ -9,8 +9,10 @@ import casesRouter from './routes/cases.js';
 import chatRouter from './routes/chat.js';
 import dashboardRouter from './routes/dashboard.js';
 import authRouter from './routes/auth.js';
+import authEnhancedRouter from './routes/auth-enhanced.js';
 import passwordResetRouter from './routes/password-reset.js';
 import profileRouter from './routes/profile.js';
+import settingsRouter from './routes/settings.js';
 import adminUsersRouter from './routes/admin/users.js';
 import adminICRouter from './routes/admin/ic-composition.js';
 import adminAuditLogRouter from './routes/admin/audit-log.js';
@@ -50,8 +52,10 @@ app.use(requestLogger);
 
 // API Routes (must come before static files)
 app.use('/api/auth', authRouter);
+app.use('/api/auth', authEnhancedRouter);
 app.use('/api/auth', passwordResetRouter);
 app.use('/api/profile', profileRouter);
+app.use('/api/settings', settingsRouter);
 app.use('/api/cases', casesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/dashboard', dashboardRouter);
