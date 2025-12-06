@@ -1,10 +1,9 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
-import ChatPage from './pages/ChatPage';
 import AboutPoSH from './pages/learn/AboutPoSH';
 import ICLandingPage from './pages/ic/ICLandingPage';
 import RoleSelection from './pages/auth/RoleSelection';
@@ -54,9 +53,10 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Application */}
+          {/* DEPRECATED: /chat route - redirects to employee dashboard with integrated chat */}
           <Route path="/chat" element={
             <ProtectedRoute>
-              <ChatPage />
+              <Navigate to="/employee/dashboard" replace />
             </ProtectedRoute>
           } />
           <Route path="/profile" element={
