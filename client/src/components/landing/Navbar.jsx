@@ -36,10 +36,10 @@ export default function Navbar() {
           {/* Login Buttons */}
           <div className="flex items-center space-x-3">
             <Link
-              to="/login/employee"
+              to="/"
               className="px-4 py-2 text-warm-700 hover:text-primary-600 font-medium transition-colors text-sm"
             >
-              Employee Login
+              Employee Sign In
             </Link>
             <Link
               to="/login/ic"

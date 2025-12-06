@@ -1,12 +1,50 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Hero() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const result = await login(formData.email, formData.password, 'employee');
+
+      if (result.success) {
+        navigate('/employee/dashboard');
+      } else {
+        setError(result.error || 'Invalid email or password. Please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section className="pt-24 pb-16 bg-gradient-to-b from-warm-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left: Text Content */}
+          {/* Left: Text Content & Login Form */}
           <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-warm-900 leading-tight">
               A safe space{' '}
@@ -18,19 +56,104 @@ export default function Hero() {
               Know your rights under the PoSH Act.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            {/* Employee Login Form */}
+            <div className="bg-white rounded-xl border border-warm-200 p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-warm-900 mb-4">Employee Sign In</h2>
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-warm-700 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2.5 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-warm-900"
+                    placeholder="your.email@company.com"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-warm-700 mb-1">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2.5 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-warm-900"
+                    placeholder="Enter your password"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <Link
+                    to="/forgot-password"
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Forgot password?
+                  </Link>
+                  <Link
+                    to="/signup/employee"
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Create account
+                  </Link>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 active:bg-primary-800 disabled:bg-warm-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? 'Signing in...' : 'Sign In'}
+                </button>
+              </form>
+
+              {/* Staff Login Links */}
+              <div className="mt-4 pt-4 border-t border-warm-200 text-center">
+                <p className="text-xs text-warm-500 mb-2">Staff Access</p>
+                <div className="flex items-center justify-center gap-4 text-sm">
+                  <Link
+                    to="/login/ic"
+                    className="text-accent-600 hover:text-accent-700 font-medium"
+                  >
+                    IC Member Login
+                  </Link>
+                  <span className="text-warm-300">|</span>
+                  <Link
+                    to="/login/admin"
+                    className="text-indigo-600 hover:text-indigo-700 font-medium"
+                  >
+                    Admin Login
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Anonymous Reporting Option */}
+            <div className="flex items-center justify-center">
               <Link
-                to="/login"
-                className="px-8 py-4 bg-accent-600 hover:bg-accent-700 text-white rounded-lg font-semibold transition-all hover:scale-105 shadow-lg text-center"
+                to="/employee/anonymous-report"
+                className="inline-flex items-center text-warm-600 hover:text-warm-900 font-medium group"
               >
-                Report an Incident
-              </Link>
-              <Link
-                to="/login"
-                className="px-8 py-4 border-2 border-primary-500 text-primary-600 hover:bg-primary-50 rounded-lg font-semibold transition-all text-center"
-              >
-                Check Case Status
+                <svg className="w-5 h-5 mr-2 text-warm-400 group-hover:text-warm-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Prefer to report anonymously?
               </Link>
             </div>
 

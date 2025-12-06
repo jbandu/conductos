@@ -45,7 +45,7 @@ function App() {
           <Route path="/ic" element={<ICLandingPage />} />
 
           {/* Authentication */}
-          <Route path="/login" element={<RoleSelection />} />
+          {/* Role selection removed - login now embedded in landing page */}
           <Route path="/login/employee" element={<EmployeeLogin />} />
           <Route path="/login/ic" element={<ICLogin />} />
           <Route path="/login/admin" element={<AdminLogin />} />
