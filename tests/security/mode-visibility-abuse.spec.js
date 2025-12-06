@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { setupApiMocks } from '../helpers/apiMocks';
 
 /**
  * CRITICAL MVP SECURITY TESTS: Mode Visibility & Abuse Prevention
@@ -8,7 +9,13 @@ import { test, expect } from '@playwright/test';
  * and document current API exposure for Phase 2 auth implementation.
  *
  * Tagged as @critical for MVP deployment.
+ *
+ * NOTE: Tests that require real API calls are skipped in CI without backend server.
+ * UI-based tests use mocked responses to ensure they run reliably in all environments.
  */
+
+// Skip real API tests in CI unless backend is explicitly available
+const skipRealApiTests = process.env.CI && !process.env.BACKEND_AVAILABLE;
 
 test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
@@ -16,6 +23,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('MUST NOT show "Show all cases" chip in Employee mode', async ({ page }) => {
       // UI-007: Employee mode must not expose IC-only features
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -35,6 +43,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('MUST NOT list all cases when asked via text in Employee mode', async ({ page }) => {
       // Security: Text commands must also respect mode
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -80,6 +89,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('MUST NOT allow status updates from Employee mode', async ({ page }) => {
       // Security: Only IC members can update case status
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -107,6 +117,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('MUST NOT show IC-specific chips in Employee mode', async ({ page }) => {
       // UI-007: IC quick chips must not appear in Employee mode
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -135,7 +146,10 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
   test.describe('Employee Mode Case Visibility - Brute Force Prevention', () => {
 
+    // This test requires a real backend server - skip in CI without backend
     test('should NOT allow brute-forcing other case codes in Employee mode', async ({ page, request }) => {
+      test.skip(skipRealApiTests, 'Requires backend server - skipped in CI');
+
       // Security: Employee trying random case codes should not see others' details
 
       // First, create a case as a different user (simulated)
@@ -184,6 +198,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('should NOT allow sequential case code enumeration', async ({ page }) => {
       // Security: Attacker shouldn't be able to iterate through KELP-2025-0001, 0002, 0003...
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -223,7 +238,10 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
   test.describe('Direct API Access - MVP Boundary Documentation', () => {
 
+    // This test requires a real backend server - skip in CI without backend
     test('documents current /api/cases GET behavior without auth', async ({ request }) => {
+      test.skip(skipRealApiTests, 'Requires backend server - skipped in CI');
+
       // MVP SECURITY BOUNDARY: Document that API is currently open
 
       const response = await request.get('/api/cases');
@@ -243,7 +261,10 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
       // Phase 2: expect(response.status()).toBe(401);
     });
 
+    // This test requires a real backend server - skip in CI without backend
     test('documents current /api/cases POST behavior without auth', async ({ request }) => {
+      test.skip(skipRealApiTests, 'Requires backend server - skipped in CI');
+
       // MVP SECURITY BOUNDARY: Case creation might not require auth
 
       const response = await request.post('/api/cases', {
@@ -268,7 +289,10 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
       // Phase 2: expect(response.status()).toBe(401);
     });
 
+    // This test requires a real backend server - skip in CI without backend
     test('documents current /api/cases/:code/status PATCH behavior', async ({ request }) => {
+      test.skip(skipRealApiTests, 'Requires backend server - skipped in CI');
+
       // MVP SECURITY BOUNDARY: Status updates might not require IC role check
 
       // First create a case
@@ -312,6 +336,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('MUST show all cases in IC mode', async ({ page }) => {
       // IC members SHOULD see all cases
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -337,6 +362,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('IC mode MUST show IC-specific quick chips', async ({ page }) => {
       // IC quick chips should be visible
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -362,6 +388,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('switching modes MUST update visible chips', async ({ page }) => {
       // UI-007: Mode toggle must correctly show/hide features
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -397,6 +424,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('mode badge MUST reflect current mode', async ({ page }) => {
       // Clear visual indicator of current mode
+      await setupApiMocks(page);
 
       await page.goto('/');
 
@@ -418,6 +446,7 @@ test.describe('Mode Visibility & Abuse - MVP Security @critical', () => {
 
     test('cannot access IC features by URL manipulation in Employee mode', async ({ page }) => {
       // Security: Even if user tries to craft URL, mode should prevent access
+      await setupApiMocks(page);
 
       await page.goto('/');
 
