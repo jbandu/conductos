@@ -63,11 +63,29 @@ jobs:
         PGPASSWORD=postgres psql -h localhost -U postgres -d conductos_test -c "SELECT 1" || exit 1
         echo "Database connection verified"
 
-    - name: Verify client can build
-      run: |
-        cd client && npm run build --if-present || echo "No build step needed for dev server"
+    - name: Build client for production
+      run: npm run build --workspace=client
       env:
-        NODE_ENV: test
+        NODE_ENV: production
+
+    - name: Start client preview server
+      run: |
+        # Start the Vite preview server in background on port 5173
+        cd client && npx vite preview --port 5173 --host 0.0.0.0 &
+
+        # Wait for server to be ready (up to 60 seconds)
+        echo "Waiting for client server to start on port 5173..."
+        for i in {1..60}; do
+          if curl -s http://localhost:5173 > /dev/null 2>&1; then
+            echo "Client server is ready!"
+            exit 0
+          fi
+          echo "Attempt $i: Server not ready yet, waiting..."
+          sleep 1
+        done
+
+        echo "ERROR: Client server failed to start within 60 seconds"
+        exit 1
 
     - name: Run Playwright tests (Chromium only)
       run: npx playwright test --project=chromium --reporter=html
@@ -76,8 +94,9 @@ jobs:
         NODE_ENV: test
         JWT_SECRET: test-secret-key-for-ci
         CI: true
-        # Ensure Playwright can find the browsers
         PLAYWRIGHT_BROWSERS_PATH: 0
+        # Tell Playwright not to start its own server
+        PLAYWRIGHT_SKIP_WEBSERVER: true
 
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
