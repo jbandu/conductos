@@ -78,7 +78,7 @@ export default function EmployeeSignup() {
       );
 
       if (result.success) {
-        navigate('/chat');
+        navigate('/employee/dashboard');
       } else {
         setErrors({ submit: result.error || 'Registration failed. Please try again.' });
       }

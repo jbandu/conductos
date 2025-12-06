@@ -29,7 +29,7 @@ export default function EmployeeLogin() {
       const result = await login(formData.email, formData.password, 'employee');
 
       if (result.success) {
-        navigate('/chat');
+        navigate('/employee/dashboard');
       } else {
         setError(result.error || 'Invalid email or password. Please try again.');
       }
