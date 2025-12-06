@@ -6,7 +6,11 @@ const ChatContext = createContext();
 export function ChatProvider({ children }) {
   const { user, isICMember } = useAuth();
   const [messages, setMessages] = useState([]);
-  const [currentMode, setCurrentMode] = useState('employee'); // 'employee' | 'ic'
+  const [currentMode, setCurrentMode] = useState(() => {
+    // Initialize from localStorage or default based on user
+    const stored = localStorage.getItem('chatMode');
+    return stored || 'employee';
+  }); // 'employee' | 'ic'
   const [isTyping, setIsTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pendingCaseCode, setPendingCaseCode] = useState(null);
@@ -14,9 +18,13 @@ export function ChatProvider({ children }) {
   // Set IC members to IC mode by default
   useEffect(() => {
     if (user && isICMember) {
-      setCurrentMode('ic');
+      const newMode = 'ic';
+      setCurrentMode(newMode);
+      localStorage.setItem('chatMode', newMode);
     } else if (user && !isICMember) {
-      setCurrentMode('employee');
+      const newMode = 'employee';
+      setCurrentMode(newMode);
+      localStorage.setItem('chatMode', newMode);
     }
   }, [user, isICMember]);
 
@@ -36,7 +44,16 @@ export function ChatProvider({ children }) {
   };
 
   const toggleMode = () => {
-    setCurrentMode(prev => prev === 'employee' ? 'ic' : 'employee');
+    setCurrentMode(prev => {
+      const newMode = prev === 'employee' ? 'ic' : 'employee';
+      localStorage.setItem('chatMode', newMode);
+      return newMode;
+    });
+  };
+
+  const updateMode = (mode) => {
+    setCurrentMode(mode);
+    localStorage.setItem('chatMode', mode);
   };
 
   const value = {
@@ -49,7 +66,7 @@ export function ChatProvider({ children }) {
     addMessage,
     clearMessages,
     toggleMode,
-    setCurrentMode,
+    setCurrentMode: updateMode,
     pendingCaseCode,
     setPendingCaseCode
   };

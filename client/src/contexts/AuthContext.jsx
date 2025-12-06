@@ -80,6 +80,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('chatMode'); // Clear chat mode on logout
   };
 
   const hasRole = (role) => {
