@@ -179,15 +179,16 @@ router.post('/', async (req, res) => {
     // Log admin action
     await client.query(`
       INSERT INTO admin_audit_log (
-        admin_user_id,
+        admin_id,
         action,
-        target_user_id,
-        new_value,
-        timestamp
-      ) VALUES ($1, $2, $3, $4, NOW())
+        target_type,
+        target_id,
+        new_value
+      ) VALUES ($1, $2, $3, $4, $5)
     `, [
       req.user.id,
       'add_ic_member',
+      'ic_member',
       user_id,
       JSON.stringify({ role, appointed_date, term_end_date })
     ]);
@@ -292,16 +293,17 @@ router.patch('/:id', async (req, res) => {
     // Log admin action
     await client.query(`
       INSERT INTO admin_audit_log (
-        admin_user_id,
+        admin_id,
         action,
-        target_user_id,
+        target_type,
+        target_id,
         old_value,
-        new_value,
-        timestamp
-      ) VALUES ($1, $2, $3, $4, $5, NOW())
+        new_value
+      ) VALUES ($1, $2, $3, $4, $5, $6)
     `, [
       req.user.id,
       'update_ic_member',
+      'ic_member',
       currentMember.rows[0].user_id,
       JSON.stringify({
         role: currentMember.rows[0].role,
@@ -365,16 +367,17 @@ router.patch('/:id/deactivate', async (req, res) => {
     // Log admin action
     await client.query(`
       INSERT INTO admin_audit_log (
-        admin_user_id,
+        admin_id,
         action,
-        target_user_id,
+        target_type,
+        target_id,
         old_value,
-        new_value,
-        timestamp
-      ) VALUES ($1, $2, $3, $4, $5, NOW())
+        new_value
+      ) VALUES ($1, $2, $3, $4, $5, $6)
     `, [
       req.user.id,
       'deactivate_ic_member',
+      'ic_member',
       currentMember.rows[0].user_id,
       JSON.stringify({ is_active: true }),
       JSON.stringify({ is_active: false })

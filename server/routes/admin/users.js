@@ -172,15 +172,16 @@ router.post('/', async (req, res) => {
     // Log admin action
     await client.query(`
       INSERT INTO admin_audit_log (
-        admin_user_id,
+        admin_id,
         action,
-        target_user_id,
-        new_value,
-        timestamp
-      ) VALUES ($1, $2, $3, $4, NOW())
+        target_type,
+        target_id,
+        new_value
+      ) VALUES ($1, $2, $3, $4, $5)
     `, [
       req.user.id,
       'create_user',
+      'user',
       newUser.id,
       JSON.stringify({ role, email })
     ]);
@@ -264,16 +265,17 @@ router.patch('/:id', async (req, res) => {
     // Log admin action
     await client.query(`
       INSERT INTO admin_audit_log (
-        admin_user_id,
+        admin_id,
         action,
-        target_user_id,
+        target_type,
+        target_id,
         old_value,
-        new_value,
-        timestamp
-      ) VALUES ($1, $2, $3, $4, $5, NOW())
+        new_value
+      ) VALUES ($1, $2, $3, $4, $5, $6)
     `, [
       req.user.id,
       'update_user',
+      'user',
       id,
       JSON.stringify({
         full_name: currentUser.rows[0].full_name,
@@ -332,16 +334,17 @@ router.patch('/:id/status', async (req, res) => {
     // Log admin action
     await client.query(`
       INSERT INTO admin_audit_log (
-        admin_user_id,
+        admin_id,
         action,
-        target_user_id,
+        target_type,
+        target_id,
         old_value,
-        new_value,
-        timestamp
-      ) VALUES ($1, $2, $3, $4, $5, NOW())
+        new_value
+      ) VALUES ($1, $2, $3, $4, $5, $6)
     `, [
       req.user.id,
       is_active ? 'activate_user' : 'deactivate_user',
+      'user',
       id,
       JSON.stringify({ is_active: currentUser.rows[0].is_active }),
       JSON.stringify({ is_active })
@@ -395,15 +398,16 @@ router.delete('/:id', async (req, res) => {
     // Log admin action
     await client.query(`
       INSERT INTO admin_audit_log (
-        admin_user_id,
+        admin_id,
         action,
-        target_user_id,
-        old_value,
-        timestamp
-      ) VALUES ($1, $2, $3, $4, NOW())
+        target_type,
+        target_id,
+        old_value
+      ) VALUES ($1, $2, $3, $4, $5)
     `, [
       req.user.id,
       'delete_user',
+      'user',
       id,
       JSON.stringify({ email: user.rows[0].email })
     ]);
