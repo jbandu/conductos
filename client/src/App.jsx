@@ -14,6 +14,7 @@ import ICLogin from './pages/auth/ICLogin';
 import AdminLogin from './pages/auth/AdminLogin';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
+import SSOCallback from './pages/auth/SSOCallback';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import ICComposition from './pages/admin/ICComposition';
@@ -46,6 +47,7 @@ function App() {
           <Route path="/signup/employee" element={<EmployeeSignup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/sso/callback" element={<SSOCallback />} />
 
           {/* Application */}
           <Route path="/chat" element={

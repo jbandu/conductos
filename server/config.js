@@ -23,5 +23,11 @@ export const config = {
   JWT_SECRET: process.env.JWT_SECRET || 'default-secret-change-in-production',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   RESEND_API_KEY: process.env.RESEND_API_KEY,
-  FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@conductos.app'
+  FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@conductos.app',
+
+  // SSO Configuration
+  SSO_BASE_URL: process.env.SSO_BASE_URL || process.env.CLIENT_URL || 'http://localhost:3001',
+  SSO_ENCRYPTION_KEY: process.env.SSO_ENCRYPTION_KEY,
+  SSO_ENCRYPTION_SALT: process.env.SSO_ENCRYPTION_SALT,
+  SSO_SESSION_DURATION: process.env.SSO_SESSION_DURATION || '8h'
 };

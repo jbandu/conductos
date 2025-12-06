@@ -81,6 +81,45 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('chatMode'); // Clear chat mode on logout
+    localStorage.removeItem('sso_session_id'); // Clear SSO session
+  };
+
+  // Set authentication from an SSO token
+  const setAuthFromToken = async (token) => {
+    try {
+      // Validate and get user info from token
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid token');
+      }
+
+      const userData = await response.json();
+
+      // Store user data and token
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', token);
+
+      // Store SSO session ID if present in token
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.sso_session_id) {
+          localStorage.setItem('sso_session_id', payload.sso_session_id);
+        }
+      } catch (e) {
+        // Ignore token parsing errors
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Token authentication error:', error);
+      return false;
+    }
   };
 
   const hasRole = (role) => {
@@ -104,6 +143,7 @@ export function AuthProvider({ children }) {
     login,
     signup,
     logout,
+    setAuthFromToken,
     hasRole
   };
 
