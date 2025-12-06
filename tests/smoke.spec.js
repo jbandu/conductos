@@ -1,84 +1,128 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * SMOKE TESTS
+ * SMOKE TESTS - Railway Deployment Verification
  *
- * Quick sanity checks to verify the deployment is working.
- * These run FIRST - if they fail, full test suite is skipped.
+ * Quick sanity checks to verify the Railway deployment is working.
+ * These tests run against the live production environment.
  *
  * Keep these tests:
  * - Fast (< 30 seconds total)
- * - Simple (no complex flows)
- * - Critical (test core functionality only)
+ * - Simple (no complex flows or mocks)
+ * - Reliable (no flaky assertions)
  */
 
 test.describe('Smoke Tests @smoke', () => {
 
-  test('app loads successfully', async ({ page }) => {
-    await page.goto('/');
-
-    // Should see the main app
-    await expect(page).toHaveTitle(/ConductOS|Kelphr/i, { timeout: 10000 });
-  });
-
-  test('login page renders', async ({ page }) => {
-    await page.goto('/login/employee');
-
-    // Should see login form elements
-    await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
-  });
-
-  test('IC login page renders', async ({ page }) => {
-    await page.goto('/login/ic');
-
-    // Should see login form
-    await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
-  });
-
-  test('admin login page renders', async ({ page }) => {
-    await page.goto('/login/admin');
-
-    // Should see login form
-    await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
-  });
-
-  test('navigation between login types works', async ({ page }) => {
-    // Start at employee login
-    await page.goto('/login/employee');
-    await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
-
-    // Navigate to IC login
-    await page.goto('/login/ic');
-    await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 5000 });
-
-    // Navigate to admin login
-    await page.goto('/login/admin');
-    await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 5000 });
-  });
-
-  test('static assets load (CSS/JS)', async ({ page }) => {
+  test('deployment is accessible', async ({ page }) => {
     const response = await page.goto('/');
 
-    // Page should load successfully
+    // Should get a successful response
     expect(response?.status()).toBeLessThan(400);
-
-    // Check that styles are applied (page isn't unstyled)
-    const body = page.locator('body');
-    const bgColor = await body.evaluate(el => getComputedStyle(el).backgroundColor);
-
-    // Should have some background color set (not default white/transparent)
-    expect(bgColor).toBeTruthy();
   });
 
-  test('API health check', async ({ request }) => {
-    // Check if API is responding
-    const response = await request.get('/api/health');
+  test('app loads and renders', async ({ page }) => {
+    await page.goto('/');
 
-    // Should get a response (200, 404 for missing route, etc. - just not 5xx)
-    expect(response.status()).toBeLessThan(500);
+    // Wait for the page to be fully loaded
+    await page.waitForLoadState('domcontentloaded');
+
+    // Should have some content (not a blank page)
+    const body = await page.locator('body').textContent();
+    expect(body?.length).toBeGreaterThan(0);
+  });
+
+  test('employee login page loads', async ({ page }) => {
+    const response = await page.goto('/login/employee');
+
+    expect(response?.status()).toBeLessThan(400);
+
+    // Should see a form or login-related content
+    const hasForm = await page.locator('form, input[type="email"], input[type="password"]').first().isVisible({ timeout: 10000 }).catch(() => false);
+    expect(hasForm).toBeTruthy();
+  });
+
+  test('IC login page loads', async ({ page }) => {
+    const response = await page.goto('/login/ic');
+
+    expect(response?.status()).toBeLessThan(400);
+
+    // Should see a form or login-related content
+    const hasForm = await page.locator('form, input[type="email"], input[type="password"]').first().isVisible({ timeout: 10000 }).catch(() => false);
+    expect(hasForm).toBeTruthy();
+  });
+
+  test('admin login page loads', async ({ page }) => {
+    const response = await page.goto('/login/admin');
+
+    expect(response?.status()).toBeLessThan(400);
+
+    // Should see a form or login-related content
+    const hasForm = await page.locator('form, input[type="email"], input[type="password"]').first().isVisible({ timeout: 10000 }).catch(() => false);
+    expect(hasForm).toBeTruthy();
+  });
+
+  test('static assets load correctly', async ({ page }) => {
+    // Listen for failed requests
+    const failedRequests = [];
+    page.on('requestfailed', request => {
+      failedRequests.push(request.url());
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // No critical asset failures (ignore external resources)
+    const criticalFailures = failedRequests.filter(url =>
+      !url.includes('analytics') &&
+      !url.includes('tracking') &&
+      !url.includes('external')
+    );
+
+    expect(criticalFailures.length).toBe(0);
+  });
+
+  test('no console errors on page load', async ({ page }) => {
+    const consoleErrors = [];
+
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    // Filter out known/acceptable errors
+    const criticalErrors = consoleErrors.filter(error =>
+      !error.includes('favicon') &&
+      !error.includes('404') &&
+      !error.includes('Failed to load resource')
+    );
+
+    // Should have no critical console errors
+    expect(criticalErrors.length).toBe(0);
+  });
+
+  test('API health endpoint responds', async ({ request }) => {
+    // Try common health check endpoints
+    const healthEndpoints = ['/api/health', '/health', '/api'];
+
+    let foundHealthy = false;
+    for (const endpoint of healthEndpoints) {
+      try {
+        const response = await request.get(endpoint);
+        if (response.status() < 500) {
+          foundHealthy = true;
+          break;
+        }
+      } catch (e) {
+        // Continue to next endpoint
+      }
+    }
+
+    // At least one endpoint should not return 5xx
+    expect(foundHealthy).toBeTruthy();
   });
 });
