@@ -23,5 +23,15 @@ export const config = {
   JWT_SECRET: process.env.JWT_SECRET || 'default-secret-change-in-production',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   RESEND_API_KEY: process.env.RESEND_API_KEY,
-  FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@conductos.app'
+  FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@conductos.app',
+
+  // Google OAuth
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+  // Security settings
+  PASSWORD_MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH) || 8,
+  PASSWORD_HISTORY_COUNT: parseInt(process.env.PASSWORD_HISTORY_COUNT) || 5,
+  ACCOUNT_LOCKOUT_ATTEMPTS: parseInt(process.env.ACCOUNT_LOCKOUT_ATTEMPTS) || 5,
+  ACCOUNT_LOCKOUT_DURATION: parseInt(process.env.ACCOUNT_LOCKOUT_DURATION) || 30 // minutes
 };
