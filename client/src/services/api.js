@@ -2,21 +2,33 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const api = {
   async getCases() {
-    const response = await fetch(`${API_BASE_URL}/cases`);
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/cases`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!response.ok) throw new Error('Failed to fetch cases');
     return response.json();
   },
 
   async getCase(id) {
-    const response = await fetch(`${API_BASE_URL}/cases/${id}`);
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/cases/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!response.ok) throw new Error('Failed to fetch case');
     return response.json();
   },
 
   async createCase(caseData) {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    // Add auth header if token exists (authenticated case creation)
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/cases`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(caseData)
     });
     if (!response.ok) throw new Error('Failed to create case');
@@ -24,9 +36,13 @@ export const api = {
   },
 
   async updateCase(id, updates) {
+    const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/cases/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(updates)
     });
     if (!response.ok) throw new Error('Failed to update case');
@@ -34,13 +50,19 @@ export const api = {
   },
 
   async getCaseHistory(id) {
-    const response = await fetch(`${API_BASE_URL}/cases/${id}/history`);
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/cases/${id}/history`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!response.ok) throw new Error('Failed to fetch case history');
     return response.json();
   },
 
   async getDashboardStats() {
-    const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!response.ok) throw new Error('Failed to fetch dashboard stats');
     return response.json();
   },
