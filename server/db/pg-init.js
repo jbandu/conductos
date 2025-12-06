@@ -241,6 +241,41 @@ export async function initializeDatabase() {
         ALTER COLUMN token DROP NOT NULL;
     `);
 
+    // Create patterns table (Pattern Analysis feature)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS patterns (
+        id SERIAL PRIMARY KEY,
+        organization_id INTEGER NOT NULL REFERENCES organizations(id),
+        pattern_type VARCHAR(50) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        severity VARCHAR(20) CHECK(severity IN ('low', 'medium', 'high', 'critical')),
+        frequency_count INTEGER DEFAULT 0,
+        related_cases INTEGER[],
+        metadata JSONB DEFAULT '{}',
+        detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'active' CHECK(status IN ('active', 'monitoring', 'resolved'))
+      )
+    `);
+
+    // Create insights table (Proactive Insights feature)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS insights (
+        id SERIAL PRIMARY KEY,
+        organization_id INTEGER NOT NULL REFERENCES organizations(id),
+        insight_type VARCHAR(50) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        recommendations TEXT[],
+        priority VARCHAR(20) CHECK(priority IN ('low', 'medium', 'high', 'critical')),
+        status VARCHAR(50) DEFAULT 'new' CHECK(status IN ('new', 'acknowledged', 'in_progress', 'resolved', 'dismissed')),
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        acknowledged_by INTEGER REFERENCES users(id),
+        acknowledged_at TIMESTAMP
+      )
+    `);
+
     // Create indexes for admin tables
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_ic_members_org ON ic_members(organization_id)
@@ -259,6 +294,18 @@ export async function initializeDatabase() {
     `);
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user ON password_reset_tokens(user_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_patterns_org ON patterns(organization_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_patterns_type ON patterns(pattern_type)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_insights_org ON insights(organization_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_insights_status ON insights(status)
     `);
 
     console.log('Database schema initialized successfully');
